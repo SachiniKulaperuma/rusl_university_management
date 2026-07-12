@@ -28,7 +28,7 @@ export const sidebarMenuData: SidebarItemData[] = [
       {
         id: "student-personal-info",
         title: "Student Personal Information",
-        path: "/register?section=student-personal-info",
+        path: "/register/student-personal-info",
         number: 1,
       },
       {

@@ -21,7 +21,7 @@ export default function SidebarItem({ title, path, number, icon, onClick }: Side
       return pathname === '/' && !searchParams.get('section');
     }
 
-    // If the path contains the section query param
+    // Support both clean nested routes and the older query-string section links.
     if (path.includes('?section=')) {
       const parts = path.split('?');
       const basePath = parts[0];

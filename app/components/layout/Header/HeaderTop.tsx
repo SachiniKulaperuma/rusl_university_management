@@ -7,7 +7,7 @@ export default function HeaderTop() {
     const isSignInPage = pathname === '/signin';
 
     return (
-        <header className="bg-red-900 shadow-lg" id="site-header">
+        <header className="sticky top-0 z-50 bg-red-900 shadow-lg" id="site-header">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <div className="flex items-center justify-between gap-6">
                     {/* Logo Section */}
