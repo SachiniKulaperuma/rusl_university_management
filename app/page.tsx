@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 const quickAccessItems = [
   {
@@ -78,33 +79,36 @@ const footerLinks = [
 export default function Home() {
   return (
     <main className="bg-[#f5efe7] text-slate-900">
-      <section className="relative overflow-hidden bg-linear-to-br from-slate-100 via-sky-50 to-orange-50">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(153,27,27,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(37,99,235,0.12),transparent_28%)]" />
-        <div className="absolute inset-x-0 top-0 h-2 bg-linear-to-r from-red-950 via-red-800 to-red-950" />
+      <section className="relative overflow-hidden">
+        {/* Campus background image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/campus-bg.jpg')" }}
+        />
+        {/* Very light overlay — keeps image visible */}
+        <div className="absolute inset-0 bg-white/30" />
         <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8 lg:py-20">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="inline-flex items-center rounded-full border border-red-950/15 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-red-950 shadow-sm backdrop-blur">
-              Smart University System for Academic Service
-            </p>
-            <h1 className="mt-6 text-4xl font-black tracking-tight text-red-950 sm:text-5xl lg:text-6xl">
+
+            <h1 className="mt-6 text-4xl font-black tracking-tight text-red-950 drop-shadow sm:text-5xl lg:text-6xl">
               WELCOME TO RUSL
             </h1>
-            <p className="mt-4 text-base font-semibold text-red-900 sm:text-lg lg:text-xl">
-              Rajarata University of Sri Lanka student services and registration portal
+            <p className="mt-4 text-base font-bold text-red-900 sm:text-lg lg:text-xl">
+              Smart University System for Academic Service
             </p>
 
             <div className="mt-10 grid gap-6 lg:grid-cols-2">
               <article className="rounded-4xl border border-white/70 bg-white/95 p-6 text-left shadow-[0_18px_45px_rgba(15,23,42,0.12)] backdrop-blur">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-950 text-yellow-300 shadow-md">
-                    <i className="fas fa-users text-2xl" />
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <div className="flex items-center justify-center">
+                    <Image src="/new-student.png" alt="New Student" width={200} height={200} />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900">New Student</h2>
                     <p className="mt-1 text-sm text-slate-600">Register as a new student and begin your academic journey.</p>
                   </div>
                 </div>
-                <div className="mt-6 flex gap-3">
+                <div className="mt-6 flex justify-center gap-3">
                   <Link
                     href="/register"
                     className="inline-flex items-center justify-center rounded-full bg-red-950 px-5 py-3 text-sm font-semibold text-yellow-300 shadow-md transition hover:bg-red-900"
@@ -116,16 +120,16 @@ export default function Home() {
               </article>
 
               <article className="rounded-4xl border border-white/70 bg-white/95 p-6 text-left shadow-[0_18px_45px_rgba(15,23,42,0.12)] backdrop-blur">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-950 text-yellow-300 shadow-md">
-                    <i className="fas fa-user-lock text-2xl" />
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <div className="flex items-center justify-center">
+                    <Image src="/current-student.png" alt="Current Student" width={90} height={90} />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900">Current Student</h2>
                     <p className="mt-1 text-sm text-slate-600">Login to access academic services and your profile.</p>
                   </div>
                 </div>
-                <div className="mt-6 flex gap-3">
+                <div className="mt-6 flex justify-center gap-3">
                   <Link
                     href="/signin"
                     className="inline-flex items-center justify-center rounded-full bg-red-950 px-5 py-3 text-sm font-semibold text-yellow-300 shadow-md transition hover:bg-red-900"
@@ -146,14 +150,28 @@ export default function Home() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {quickAccessItems.map((item) => (
+          {quickAccessItems.map((item, index) => (
             <Link
               key={item.title}
               href={item.href}
               className="group rounded-2xl border border-slate-200 bg-white p-4 text-center shadow-[0_10px_28px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(15,23,42,0.12)]"
             >
-              <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br ${item.accent} text-white shadow-md transition group-hover:scale-105`}>
-                <i className={`${item.icon} text-xl`} />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl transition group-hover:scale-105">
+                {index === 0 ? (
+                  <Image src="/registration-icon.png" alt="Registration" width={200} height={200} />
+                ) : index === 1 ? (
+                  <Image src="/subject-registration-icon.png" alt="Subject Registration" width={200} height={200} />
+                ) : index === 2 ? (
+                  <Image src="/exam-admission-icon.png" alt="Exam Admission" width={200} height={200} />
+                ) : index === 3 ? (
+                  <Image src="/profile-icon.png" alt="Profile" width={200} height={200} />
+                ) : index === 4 ? (
+                  <Image src="/notices-icon.png" alt="Notices" width={200} height={200} />
+                ) : index === 5 ? (
+                  <Image src="/help-icon.png" alt="Help" width={200} height={200} />
+                ) : (
+                  <i className={`${item.icon} text-xl`} />
+                )}
               </div>
               <h3 className="mt-4 text-sm font-bold text-slate-900">{item.title}</h3>
               <p className="mt-1 text-xs leading-5 text-slate-600">{item.description}</p>
@@ -164,9 +182,7 @@ export default function Home() {
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-4xl border border-slate-200 bg-white p-6 shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
             <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-950 text-yellow-300">
-                <i className="fas fa-volume-high" />
-              </div>
+              <Image src="/announcements-icon.png" alt="Announcements" width={40} height={40} />
               <h3 className="text-2xl font-bold text-slate-900">Latest Announcements</h3>
             </div>
 
