@@ -597,10 +597,6 @@ export default function MahapolaPage() {
       `}</style>
 
             <div style={{ display: 'flex' }}>
-                <div className="reg-sidebar">
-                    {/* Sidebar will be added here */}
-                </div>
-
                 <main className="reg-main" id="reg-main">
                     <div className="info-card" id="Mahapola-card">
                         <div className="info-card-header">

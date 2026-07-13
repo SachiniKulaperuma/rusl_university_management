@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 export default function BursaryPage() {
   const [toastVisible, setToastVisible] = useState(false);
-  const [toastMessage, setToastMessage] = useState('Form download started!');
+  const [toastMessage, setToastMessage] = useState("Form download started!");
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -124,28 +124,28 @@ export default function BursaryPage() {
 </body>
 </html>`;
 
-    const blob = new Blob([formHTML], { type: 'text/html' });
+    const blob = new Blob([formHTML], { type: "text/html" });
     return URL.createObjectURL(blob);
   };
 
   const downloadForm = () => {
-    showToast('Bursary application form download started!');
-    const link = document.createElement('a');
+    showToast("Bursary application form download started!");
+    const link = document.createElement("a");
     link.href = generateBursaryFormDataURL();
-    link.download = 'RUSL_Bursary_Application_Form.html';
+    link.download = "RUSL_Bursary_Application_Form.html";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
   const logoutUser = () => {
-    sessionStorage.removeItem('rusl_user');
-    window.location.href = 'signin.html';
+    sessionStorage.removeItem("rusl_user");
+    window.location.href = "signin.html";
   };
 
   useEffect(() => {
-    const stored = sessionStorage.getItem('rusl_user');
-    const authArea = document.getElementById('header-auth-area');
+    const stored = sessionStorage.getItem("rusl_user");
+    const authArea = document.getElementById("header-auth-area");
     if (!stored || !authArea) return;
 
     try {
@@ -156,7 +156,7 @@ export default function BursaryPage() {
             <i class="fas fa-user-circle" style="color:var(--gold);font-size:1.1rem;"></i>
             <div style="line-height:1.2;">
               <div style="font-size:.75rem;color:rgba(255,255,255,.6);">${user.role}</div>
-              <div style="font-size:.85rem;color:#fff;font-weight:600;">${user.name.split(' ')[0]}</div>
+              <div style="font-size:.85rem;color:#fff;font-weight:600;">${user.name.split(" ")[0]}</div>
             </div>
           </div>
           <button onclick="(${logoutUser.toString()})();" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;font-size:.83rem;font-weight:600;cursor:pointer;font-family:var(--font);transition:all .2s;">
@@ -164,7 +164,7 @@ export default function BursaryPage() {
           </button>
         </div>`;
     } catch {
-      sessionStorage.removeItem('rusl_user');
+      sessionStorage.removeItem("rusl_user");
     }
   }, []);
 
@@ -596,11 +596,7 @@ export default function BursaryPage() {
         }
       `}</style>
 
-      <div style={{ display: 'flex' }}>
-        <div className="reg-sidebar">
-          {/* Sidebar will be added here */}
-        </div>
-
+      <div style={{ display: "flex" }}>
         <main className="reg-main" id="reg-main">
           <div className="info-card" id="bursary-card">
             <div className="info-card-header">
@@ -612,29 +608,44 @@ export default function BursaryPage() {
 
             <div className="info-body">
               <div className="section-heading" id="sec-eligibility">
-                <i className="fas fa-circle-check"></i> Eligibility Criteria for Applying Bursaries
+                <i className="fas fa-circle-check"></i> Eligibility Criteria for
+                Applying Bursaries
               </div>
 
               <div className="eligibility-box">
                 <p className="elig-main">
-                  Parental annual income should be equal or less than to <strong>Rs. 500,000/=</strong>
+                  Parental annual income should be equal or less than to{" "}
+                  <strong>Rs. 500,000/=</strong>
                 </p>
-                <p style={{ fontSize: '.84rem', fontWeight: 600, color: '#5a3e00', marginBottom: '8px' }}>
-                  The following concessions to be added to the Income Ceilings specified above:
+                <p
+                  style={{
+                    fontSize: ".84rem",
+                    fontWeight: 600,
+                    color: "#5a3e00",
+                    marginBottom: "8px",
+                  }}
+                >
+                  The following concessions to be added to the Income Ceilings
+                  specified above:
                 </p>
                 <ul className="concession-list">
                   <li>
                     <span className="concession-label">a)</span>
                     <span>
-                      Rs. 24,000/= concession per annum per school going sister/brother who is <strong>19 years or under</strong>,
+                      Rs. 24,000/= concession per annum per school going
+                      sister/brother who is <strong>19 years or under</strong>,
                       up to a maximum of three children.
                     </span>
                   </li>
                   <li>
                     <span className="concession-label">b)</span>
                     <span>
-                      Rs. 36,000/= per annum per school going sister/brother following a course in a University but
-                      <strong>not in receipt of a Mahapola scholarship or a Bursary</strong>.
+                      Rs. 36,000/= per annum per school going sister/brother
+                      following a course in a University but
+                      <strong>
+                        not in receipt of a Mahapola scholarship or a Bursary
+                      </strong>
+                      .
                     </span>
                   </li>
                 </ul>
@@ -643,73 +654,100 @@ export default function BursaryPage() {
               <div className="notice-bar">
                 <i className="fas fa-circle-info"></i>
                 <span>
-                  Only students who are eligible according to the above criteria for bursary, should proceed (apply) through
-                  the following steps. <strong>Others should not require to complete and return this form.</strong>
+                  Only students who are eligible according to the above criteria
+                  for bursary, should proceed (apply) through the following
+                  steps.{" "}
+                  <strong>
+                    Others should not require to complete and return this form.
+                  </strong>
                 </span>
               </div>
 
               <hr className="content-divider" />
 
               <div className="section-heading" id="sec-conditions">
-                <i className="fas fa-gavel"></i> Condition Governing the Payment of Bursaries
+                <i className="fas fa-gavel"></i> Condition Governing the Payment
+                of Bursaries
               </div>
 
               <ul className="condition-list">
                 <li>
-                  Any student who provides false, inaccurate statement or who fails to disclose any material fact in
-                  his/her application is liable to have his/her enrolment as an internal student cancelled.
+                  Any student who provides false, inaccurate statement or who
+                  fails to disclose any material fact in his/her application is
+                  liable to have his/her enrolment as an internal student
+                  cancelled.
                 </li>
                 <li>
-                  The student who have applied for a Bursary or who are in receipt of Bursary should communicate in writing
-                  to the Registrar of the University in receipt of any changes of family income, marital status,
-                  employment income etc.
+                  The student who have applied for a Bursary or who are in
+                  receipt of Bursary should communicate in writing to the
+                  Registrar of the University in receipt of any changes of
+                  family income, marital status, employment income etc.
                 </li>
                 <li>
-                  The Bursaries will be paid only during period of study in the University. The recipient of Bursary who
-                  for any reason temporarily ceases to follow the course of study or leaves the University before
-                  completion of study, should communicate that fact in writing to the Registrar of the University as the
-                  case may be.
+                  The Bursaries will be paid only during period of study in the
+                  University. The recipient of Bursary who for any reason
+                  temporarily ceases to follow the course of study or leaves the
+                  University before completion of study, should communicate that
+                  fact in writing to the Registrar of the University as the case
+                  may be.
                 </li>
                 <li>
-                  The payment of a Bursary to any student may be completely stopped or temporarily suspended for any one
-                  or more of the following reasons:
+                  The payment of a Bursary to any student may be completely
+                  stopped or temporarily suspended for any one or more of the
+                  following reasons:
                   <ul className="sub-condition-list">
                     <li>
                       <span className="sub-label">a)</span>
-                      <span>The Bursary may be paid to any student who has been referred at the first year examination and
-                        who is following the course prescribed for the second year.</span>
+                      <span>
+                        The Bursary may be paid to any student who has been
+                        referred at the first year examination and who is
+                        following the course prescribed for the second year.
+                      </span>
                     </li>
                     <li>
                       <span className="sub-label">b)</span>
-                      <span>If the student fails to take any examination at the first available occasion for any reason
-                        which is not acceptable by the Vice Chancellor.</span>
+                      <span>
+                        If the student fails to take any examination at the
+                        first available occasion for any reason which is not
+                        acceptable by the Vice Chancellor.
+                      </span>
                     </li>
                     <li>
                       <span className="sub-label">c)</span>
-                      <span>If the student conducts himself in an indiscipline manner.</span>
+                      <span>
+                        If the student conducts himself in an indiscipline
+                        manner.
+                      </span>
                     </li>
                     <li>
                       <span className="sub-label">d)</span>
-                      <span>For any other valid reason, to be decided upon at the discretion of the Vice Chancellor.</span>
+                      <span>
+                        For any other valid reason, to be decided upon at the
+                        discretion of the Vice Chancellor.
+                      </span>
                     </li>
                   </ul>
                 </li>
                 <li>
-                  University authorities have their discretion on matters relating to the restoration of Bursaries, which
-                  have been stopped or temporarily suspended.
+                  University authorities have their discretion on matters
+                  relating to the restoration of Bursaries, which have been
+                  stopped or temporarily suspended.
                 </li>
                 <li>
-                  Each eligible student will be paid maximum of <strong>10 monthly installments</strong> per academic year.
+                  Each eligible student will be paid maximum of{" "}
+                  <strong>10 monthly installments</strong> per academic year.
                 </li>
                 <li>
-                  Conditions applicable to Mahapola scholarships are generally applicable to Bursaries too.
+                  Conditions applicable to Mahapola scholarships are generally
+                  applicable to Bursaries too.
                 </li>
               </ul>
 
               <div className="warning-box">
                 <i className="fas fa-triangle-exclamation"></i>
                 <span>
-                  If you are in receipt of Mahapola scholarship, <strong>you will not be awarded the Bursary.</strong>
+                  If you are in receipt of Mahapola scholarship,{" "}
+                  <strong>you will not be awarded the Bursary.</strong>
                   Under no condition duplicate Bursary form will be issued.
                 </span>
               </div>
@@ -717,51 +755,66 @@ export default function BursaryPage() {
               <hr className="content-divider" />
 
               <div className="section-heading" id="sec-instructions">
-                <i className="fas fa-clipboard-list"></i> Instruction to the Applicant
+                <i className="fas fa-clipboard-list"></i> Instruction to the
+                Applicant
               </div>
 
               <p className="instruction-para">
-                All details asked for regarding all avenues of income must be mentioned. Information supplied by regarding
-                your income will be verified from relevant officials and the Department of Inland Revenue. Documents,
-                relevant to the information sought for under No. IV of the application form regarding details of salary
-                under annual gross income of parents — Pension Certificates, Death Certificates, Detail of pension,
-                Income of House, Property and Business Enterprises — must be attached to the application form.
+                All details asked for regarding all avenues of income must be
+                mentioned. Information supplied by regarding your income will be
+                verified from relevant officials and the Department of Inland
+                Revenue. Documents, relevant to the information sought for under
+                No. IV of the application form regarding details of salary under
+                annual gross income of parents — Pension Certificates, Death
+                Certificates, Detail of pension, Income of House, Property and
+                Business Enterprises — must be attached to the application form.
               </p>
 
               <p className="instruction-para">
-                No cage must be left blank or closed by lines. Where there is no relevant information to be supplied,
-                that must be so mentioned. Incomplete forms, applications received later than due date and application
-                not sent through the Grama Niladhari and Divisional Secretary will be rejected.
+                No cage must be left blank or closed by lines. Where there is no
+                relevant information to be supplied, that must be so mentioned.
+                Incomplete forms, applications received later than due date and
+                application not sent through the Grama Niladhari and Divisional
+                Secretary will be rejected.
               </p>
 
               <p className="instruction-para">
-                This application must be duly completed, and handed over to the Grama Niladhari of the area with the
-                relevant documents to enable him to be received on or before the deadline specified in the covering
-                letter of enrolment. The Grama Niladhari will (as per cage VIII) send it through the Divisional Secretary
-                in time as required. As the Bursary form needs to be sent by registered post, an envelope (6"×9") stamped
-                to the value of <strong>Rs. 55.00</strong> (or postage according to the weight) on which the University
-                address written must be handed over to Grama Niladhari with application form. Under no circumstances
+                This application must be duly completed, and handed over to the
+                Grama Niladhari of the area with the relevant documents to
+                enable him to be received on or before the deadline specified in
+                the covering letter of enrolment. The Grama Niladhari will (as
+                per cage VIII) send it through the Divisional Secretary in time
+                as required. As the Bursary form needs to be sent by registered
+                post, an envelope (6&ldquo;×9&rdquo;) stamped to the value of{" "}
+                <strong>Rs. 55.00</strong> (or postage according to the weight)
+                on which the University address written must be handed over to
+                Grama Niladhari with application form. Under no circumstances
                 must the application form be returned by the applicant.
               </p>
 
               <p className="instruction-para">
-                It must be clearly understood that if the University authorities are convinced that the information
-                provided on the application form is false, legal action will be taken against you, or even your internal
-                studentship will be cancelled.
+                It must be clearly understood that if the University authorities
+                are convinced that the information provided on the application
+                form is false, legal action will be taken against you, or even
+                your internal studentship will be cancelled.
               </p>
 
               <p className="instruction-para">
-                All decisions regarding the award of the Bursary, rejection of the Bursary, or discontinuing are made
-                by the University. Therefore, please note that requests regarding Bursaries must not be made by the
-                University Grants Commission, and such requests will not be responded.
+                All decisions regarding the award of the Bursary, rejection of
+                the Bursary, or discontinuing are made by the University.
+                Therefore, please note that requests regarding Bursaries must
+                not be made by the University Grants Commission, and such
+                requests will not be responded.
               </p>
 
               <div className="info-box">
                 <i className="fas fa-piggy-bank"></i>
                 <span>
-                  All applicants shall have/open a <strong>new bank saving account at the Bank of Ceylon</strong> reserved
-                  for bursary transaction. The photocopy of the passbook, showing the account number, shall be attached
-                  along with the bursary application.
+                  All applicants shall have/open a{" "}
+                  <strong>new bank saving account at the Bank of Ceylon</strong>{" "}
+                  reserved for bursary transaction. The photocopy of the
+                  passbook, showing the account number, shall be attached along
+                  with the bursary application.
                 </span>
               </div>
             </div>
@@ -773,10 +826,17 @@ export default function BursaryPage() {
                 </div>
                 <div className="download-meta">
                   <h4>Bursary Application Form</h4>
-                  <p>Official form – PDF format &nbsp;|&nbsp; Fill, sign and submit via Grama Niladhari</p>
+                  <p>
+                    Official form – PDF format &nbsp;|&nbsp; Fill, sign and
+                    submit via Grama Niladhari
+                  </p>
                 </div>
               </div>
-              <button className="btn-download" id="btn-download-form" onClick={downloadForm}>
+              <button
+                className="btn-download"
+                id="btn-download-form"
+                onClick={downloadForm}
+              >
                 <i className="fas fa-download"></i> Download Form
               </button>
             </div>
@@ -784,7 +844,7 @@ export default function BursaryPage() {
         </main>
       </div>
 
-      <div className={`toast ${toastVisible ? 'show' : ''}`} id="toast">
+      <div className={`toast ${toastVisible ? "show" : ""}`} id="toast">
         <i className="fas fa-circle-check"></i>
         <span id="toast-msg">{toastMessage}</span>
       </div>
