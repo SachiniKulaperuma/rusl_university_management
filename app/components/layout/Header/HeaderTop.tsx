@@ -1,54 +1,141 @@
 'use client';
 
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 export default function HeaderTop() {
-    const pathname = usePathname();
-    const isSignInPage = pathname === '/signin';
+  const pathname = usePathname();
+  const isSignInPage = pathname === '/signin';
 
-    return (
-        <header className="sticky top-0 z-50 bg-red-900 shadow-lg" id="site-header">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <div className="flex items-center justify-between gap-6">
-                    {/* Logo Section */}
-                    <a href="#" className="flex items-center gap-4 group" id="header-logo">
-                        {/* Emblem Circle */}
-                        <div className="flex-shrink-0">
-                            <div className="relative w-16 h-16 flex items-center justify-center bg-white rounded-full shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300">
-                                <div className="absolute inset-1 border-2 border-red-900 rounded-full opacity-30"></div>
-                                <i className="fas fa-dharmachakra text-3xl text-red-900"></i>
-                            </div>
-                        </div>
+  return (
+    <header
+      id="site-header"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: '#6b0000',           /* deep maroon matching screenshot */
+        boxShadow: '0 2px 8px rgba(0,0,0,0.35)',
+        width: '100%',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          height: 72,
+          padding: '0 28px',
+          position: 'relative',
+        }}
+      >
+        {/* ── invisible spacer so logo stays centred ── */}
+        <div style={{ width: 110, flexShrink: 0 }} />
 
-                        {/* Text Block */}
-                        <div className="flex flex-col gap-1 group-hover:text-yellow-100 transition-colors duration-300">
-                            <span className="text-sm font-semibold text-yellow-300 leading-tight block">
-                                ශ්‍රී ලංකා රජරට විශ්ව විද්‍යාලය
-                            </span>
-                            <span className="text-sm font-semibold text-yellow-300 leading-tight block">
-                                இலங்கை இராஜரட பல்கலைக்கழகம்
-                            </span>
-                            <span className="text-base font-bold text-white leading-tight">
-                                Rajarata University of Sri Lanka
-                            </span>
-                        </div>
-                    </a>
+        {/* ── CENTRE: logo + text ── */}
+        <a
+          href="/"
+          id="header-logo"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            textDecoration: 'none',
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+          }}
+        >
+          {/* Emblem */}
+          <div style={{
+            width: 52,
+            height: 52,
+            borderRadius: '50%',
+            background: '#fff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            overflow: 'hidden',
+          }}>
+            <Image
+              src="/logo.png"
+              alt="RUSL Emblem"
+              width={44}
+              height={44}
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </div>
 
-                    {/* Auth Area - Hide on signin page */}
-                    {!isSignInPage && (
-                        <div className="flex-shrink-0">
-                            <a
-                                href="/signin"
-                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-red-900 font-semibold rounded-lg hover:bg-yellow-100 hover:text-red-900 transition-all duration-300 shadow-md hover:shadow-lg active:scale-95"
-                                id="header-login-btn"
-                            >
-                                <i className="fas fa-user text-base"></i>
-                                <span>Login</span>
-                            </a>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </header>
-    )
+          {/* University name lines */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, textAlign: 'center' }}>
+            <span style={{
+              fontSize: '0.70rem',
+              fontWeight: 600,
+              color: '#f5d76e',
+              lineHeight: 1.3,
+              letterSpacing: '0.01em',
+            }}>
+              ශ්‍රී ලංකා රජරට විශ්ව විද්‍යාලය
+            </span>
+            <span style={{
+              fontSize: '0.70rem',
+              fontWeight: 600,
+              color: '#f5d76e',
+              lineHeight: 1.3,
+              letterSpacing: '0.01em',
+            }}>
+              இலங்கை இராஜரட பல்கலைக்கழகம்
+            </span>
+            <span style={{
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              color: '#ffffff',
+              lineHeight: 1.3,
+              letterSpacing: '0.02em',
+            }}>
+              Rajarata University of Sri Lanka
+            </span>
+          </div>
+        </a>
+
+        {/* ── RIGHT: Login button ── */}
+        {!isSignInPage && (
+          <div style={{ flexShrink: 0 }}>
+            <a
+              href="/signin"
+              id="header-login-btn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 7,
+                padding: '7px 22px',
+                background: 'transparent',
+                border: '1.5px solid rgba(255,255,255,0.7)',
+                borderRadius: 5,
+                color: '#fff',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+                letterSpacing: '0.03em',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+                e.currentTarget.style.borderColor = '#fff';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)';
+              }}
+            >
+              <i className="fas fa-user" style={{ fontSize: '0.78rem' }} />
+              Login
+            </a>
+          </div>
+        )}
+      </div>
+    </header>
+  );
 }

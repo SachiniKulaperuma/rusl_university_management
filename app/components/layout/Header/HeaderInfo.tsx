@@ -2,52 +2,128 @@
 
 export default function HeaderInfo() {
   return (
-    <div className="bg-white text-slate-900 border-b border-slate-200" id="info-bar">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-3 py-3 text-sm">
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-slate-700">
-            <a
-              href="mailto:info@rjt.ac.lk"
-              className="flex items-center gap-2 hover:text-sky-600 transition"
-              id="info-email"
-            >
-              <i className="fas fa-envelope"></i>
-              <span>info@rjt.ac.lk</span>
-            </a>
+    <div
+      id="info-bar"
+      style={{
+        width: '100%',
+        background: '#ffffff',
+        borderTop: '1px solid #e2e2e2',
+        borderBottom: '1px solid #e2e2e2',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'stretch',
+          height: 38,
+          width: '100%',
+        }}
+      >
+        {/* ── LEFT: fills all remaining space ── */}
+        <div style={{ display: 'flex', alignItems: 'stretch', flex: 1 }}>
 
-            <span className="hidden sm:inline text-slate-300">|</span>
+          {/* Email cell */}
+          <a
+            href="mailto:info@rjt.ac.lk"
+            id="info-email"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 24px',
+              color: '#222',
+              textDecoration: 'none',
+              fontSize: '0.77rem',
+              borderRight: '1px solid #d8d8d8',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.01em',
+              transition: 'color 0.18s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#7C0A02')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#222')}
+          >
+            info@rjt.ac.lk
+          </a>
 
-            <a
-              href="tel:+94252266643"
-              className="flex items-center gap-2 hover:text-sky-600 transition"
-              id="info-phone"
-            >
-              <i className="fas fa-phone"></i>
-              <span>+94 (25) 2266643</span>
-            </a>
+          {/* Phone cell */}
+          <a
+            href="tel:+94252266643"
+            id="info-phone"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              padding: '0 24px',
+              color: '#1155cc',
+              textDecoration: 'underline',
+              fontSize: '0.77rem',
+              fontWeight: 600,
+              borderRight: '1px solid #d8d8d8',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.01em',
+              transition: 'color 0.18s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#7C0A02')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#1155cc')}
+          >
+            +94 (25) 2266643
+          </a>
 
-            <span className="hidden lg:inline text-slate-300">|</span>
-
-            <div className="flex items-center gap-2 text-slate-700 hover:text-sky-600 transition" id="info-address">
-              <i className="fas fa-location-dot"></i>
-              <span>Rajarata University of Sri Lanka, Mihintale - 50300, Sri Lanka</span>
-            </div>
+          {/* Address cell — stretches to fill remaining space */}
+          <div
+            id="info-address"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 7,
+              padding: '0 24px',
+              color: '#222',
+              fontSize: '0.77rem',
+              whiteSpace: 'nowrap',
+              letterSpacing: '0.01em',
+              flex: 1,                          /* fills remaining space */
+              borderRight: '1px solid #d8d8d8',
+            }}
+          >
+            <i className="fas fa-map-marker-alt" style={{ color: '#7C0A02', fontSize: '0.72rem', flexShrink: 0 }} />
+            Rajarata University of Sri Lanka, Mihintale - 50300, Sri Lanka
           </div>
+        </div>
 
-          <div className="flex items-center gap-3 text-slate-700">
-            <a href="#" aria-label="Facebook" className="hover:text-sky-600 transition" id="is-fb">
-              <i className="fab fa-facebook-f"></i>
+        {/* ── RIGHT: social icon cells ── */}
+        <div style={{ display: 'flex', alignItems: 'stretch' }}>
+          {[
+            { id: 'is-fb', icon: 'fab fa-facebook-f',  label: 'Facebook' },
+            { id: 'is-tw', icon: 'fab fa-twitter',     label: 'Twitter'  },
+            { id: 'is-li', icon: 'fab fa-linkedin-in', label: 'LinkedIn' },
+            { id: 'is-yt', icon: 'fab fa-youtube',     label: 'YouTube'  },
+          ].map(({ id, icon, label }) => (
+            <a
+              key={id}
+              href="#"
+              id={id}
+              aria-label={label}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 42,
+                color: '#555',
+                borderLeft: '1px solid #d8d8d8',
+                fontSize: '0.80rem',
+                textDecoration: 'none',
+                transition: 'color 0.18s, background 0.18s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.color = '#7C0A02';
+                e.currentTarget.style.background = '#f7f0ef';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.color = '#555';
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <i className={icon} />
             </a>
-            <a href="#" aria-label="Twitter" className="hover:text-sky-600 transition" id="is-tw">
-              <i className="fab fa-twitter"></i>
-            </a>
-            <a href="#" aria-label="LinkedIn" className="hover:text-sky-600 transition" id="is-li">
-              <i className="fab fa-linkedin-in"></i>
-            </a>
-            <a href="#" aria-label="YouTube" className="hover:text-sky-600 transition" id="is-yt">
-              <i className="fab fa-youtube"></i>
-            </a>
-          </div>
+          ))}
         </div>
       </div>
     </div>

@@ -228,8 +228,8 @@ export default function Home() {
 
               <div className="hidden md:block self-end rounded-4xl bg-linear-to-br from-red-50 via-white to-amber-50 p-4">
                 <div className="flex h-48 w-40 items-end justify-center rounded-[28px] bg-linear-to-b from-red-200 to-red-100 p-4 shadow-inner">
-                  <div className="flex h-32 w-24 items-end justify-center rounded-t-full bg-red-950/90 text-white">
-                    <i className="fas fa-user-graduate text-5xl pb-3" />
+                  <div className="flex h-32 w-24 items-end justify-center rounded-t-full bg-red-950/90 text-white overflow-hidden">
+                    <Image src="/student.png" alt="Student illustration" width={96} height={96} className="object-contain" />
                   </div>
                 </div>
               </div>
