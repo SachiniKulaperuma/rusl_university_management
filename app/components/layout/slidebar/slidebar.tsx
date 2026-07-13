@@ -31,17 +31,18 @@ export default function Sidebar() {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed top-[96px] bottom-0 left-0 z-40 w-80 bg-[#6b6363] flex flex-col border-r border-gray-700/30 transition-transform duration-300 lg:translate-x-0
+        className={`fixed bottom-0 left-0 z-40 w-80 bg-[#6b6363] flex flex-col border-r border-gray-700/30 transition-transform duration-300 lg:translate-x-0
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        style={{ top: '146px' }}
       >
         {/* Top maroon border matching university headers */}
-        <div className="h-1.5 bg-red-950 w-full flex-shrink-0" />
+        <div className="h-1.5 bg-red-950 w-full shrink-0" />
 
         {/* Scrollable list menu */}
         <SidebarMenu />
 
         {/* Sidebar Footer */}
-        <div className="p-4 border-t border-white/10 text-center flex-shrink-0 bg-black/10">
+        <div className="p-4 border-t border-white/10 text-center shrink-0 bg-black/10">
           <p className="text-[10px] text-white/50 leading-relaxed font-mono">
             Rajarata University of Sri Lanka<br />
             © {new Date().getFullYear()} All Rights Reserved

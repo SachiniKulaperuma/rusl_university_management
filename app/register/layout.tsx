@@ -7,7 +7,7 @@ export default function RegisterLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-[calc(100vh-96px)] bg-[#f4efe7]">
+    <div className="min-h-[calc(100vh-108px)] bg-[#f4efe7]">
       <Suspense fallback={<div className="p-4 text-slate-600">Loading navigation…</div>}>
         <Sidebar />
       </Suspense>
