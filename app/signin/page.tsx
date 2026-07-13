@@ -1,11 +1,21 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+// ── Login credentials ──────────────────────────
+const VALID_USERNAME = 'student';
+const VALID_PASSWORD = 'student123';
+// ──────────────────────────────────────────────
 
 export default function SignIn() {
+    const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -13,7 +23,25 @@ export default function SignIn() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Add your login logic here
+        setError('');
+        setSuccess('');
+
+        if (!username || !password) {
+            setError('Please enter both username and password.');
+            return;
+        }
+
+        setLoading(true);
+
+        setTimeout(() => {
+            if (username.trim() === VALID_USERNAME && password === VALID_PASSWORD) {
+                setSuccess('Login successful! Redirecting to your profile…');
+                setTimeout(() => router.push('/student-profile'), 1000);
+            } else {
+                setError('Invalid username or password. Please try again.');
+                setLoading(false);
+            }
+        }, 600);
     };
 
     return (
@@ -22,9 +50,12 @@ export default function SignIn() {
                 {/* Sign In Card */}
                 <div className="bg-white rounded-lg shadow-2xl p-8 sm:p-10">
                     {/* Heading */}
-                    <h1 className="text-3xl font-bold text-center text-gray-900 mb-8" id="signin-heading">
+                    <h1 className="text-3xl font-bold text-center text-gray-900 mb-2" id="signin-heading">
                         Sign In
                     </h1>
+                    <p className="text-center text-sm text-gray-500 mb-8">
+                        Username: <strong>student</strong> &nbsp;|&nbsp; Password: <strong>student123</strong>
+                    </p>
 
                     {/* Error Alert */}
                     {error && (
@@ -63,11 +94,13 @@ export default function SignIn() {
                                 Username
                             </label>
                             <input
-                                type="email"
+                                type="text"
                                 id="username"
                                 name="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent transition"
-                                placeholder="example@gmail.com"
+                                placeholder="Enter your username"
                                 autoComplete="username"
                                 required
                                 aria-required="true"
@@ -87,6 +120,8 @@ export default function SignIn() {
                                     type={showPassword ? 'text' : 'password'}
                                     id="password"
                                     name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-900 focus:border-transparent transition pr-10"
                                     placeholder="••••••••"
                                     autoComplete="current-password"
@@ -118,7 +153,7 @@ export default function SignIn() {
                                 <span className="text-sm text-gray-700">Remember Me</span>
                             </label>
                             <a
-                                href="#"
+                                href="/forgot-password"
                                 className="text-sm text-red-900 hover:text-red-700 font-medium transition"
                                 id="forgot-password-link"
                             >
@@ -129,15 +164,17 @@ export default function SignIn() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            className="w-full px-4 py-3 mt-7 bg-red-900 hover:bg-red-800 text-white font-semibold rounded-lg transition duration-200 active:scale-95 shadow-md hover:shadow-lg"
+                            disabled={loading}
+                            className="w-full px-4 py-3 mt-7 bg-red-900 hover:bg-red-800 text-white font-semibold rounded-lg transition duration-200 active:scale-95 shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             id="signin-button"
                         >
-                            SIGN IN
+                            {loading && <i className="fas fa-circle-notch fa-spin"></i>}
+                            {loading ? 'Signing In…' : 'SIGN IN'}
                         </button>
 
                         {/* Register Link */}
                         <p className="text-center text-sm text-gray-600 mt-6">
-                            Don't you have an account?
+                            Don&apos;t you have an account?
                             <a
                                 href="#"
                                 className="ml-1 text-red-900 hover:text-red-700 font-medium transition"

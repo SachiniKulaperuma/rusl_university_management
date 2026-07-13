@@ -46,17 +46,17 @@ export function InlineField({
 	type = 'text',
 }: InlineFieldProps) {
 	return (
-		<div className="grid gap-2 sm:max-w-[280px]">
-			<label className="text-sm font-medium text-stone-800" htmlFor={htmlFor}>
+		<span className="inline-grid gap-1 align-bottom sm:max-w-[280px]">
+			<label className="text-xs font-medium text-stone-600" htmlFor={htmlFor}>
 				{numberLabel ? (
-					<span className="mr-2 inline-flex min-w-11 justify-center rounded-full bg-[#7b0000] px-2 py-0.5 text-[11px] font-semibold tracking-wide text-amber-100">
+					<span className="mr-1 inline-flex min-w-11 justify-center rounded-full bg-[#7b0000] px-2 py-0.5 text-[11px] font-semibold tracking-wide text-amber-100">
 						{numberLabel}
 					</span>
 				) : null}
 				{label}
 			</label>
 			<input id={htmlFor} name={htmlFor} type={type} placeholder={placeholder} className={fieldClassName()} />
-		</div>
+		</span>
 	);
 }
 
