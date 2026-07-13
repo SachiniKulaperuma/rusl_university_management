@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import SidebarItem from './slidebarItem';
 import { SidebarSubItem } from './slidebarData';
 
@@ -13,23 +13,16 @@ interface SidebarGroupProps {
 
 export default function SidebarGroup({ title, icon, subItems }: SidebarGroupProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [isOpen, setIsOpen] = useState(true); // Open by default for easier visibility
 
   // Automatically open the dropdown if one of its sub-items is active
   useEffect(() => {
-    const hasActiveChild = subItems.some((item) => {
-      const urlObj = new URL(item.path, 'http://localhost');
-      const targetSection = urlObj.searchParams.get('section');
-      const currentSection = searchParams.get('section');
-
-      return pathname === urlObj.pathname && currentSection === targetSection;
-    });
+    const hasActiveChild = subItems.some((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
 
     if (hasActiveChild) {
       setIsOpen(true);
     }
-  }, [pathname, searchParams, subItems]);
+  }, [pathname, subItems]);
 
   const toggleOpen = () => {
     setIsOpen(!isOpen);

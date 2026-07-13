@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 interface SidebarItemProps {
   title: string;
@@ -13,30 +13,7 @@ interface SidebarItemProps {
 
 export default function SidebarItem({ title, path, number, icon, onClick }: SidebarItemProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  // Determine if this item is currently active
-  const isActive = () => {
-    if (path === '/') {
-      return pathname === '/' && !searchParams.get('section');
-    }
-
-    // Support both clean nested routes and the older query-string section links.
-    if (path.includes('?section=')) {
-      const parts = path.split('?');
-      const basePath = parts[0];
-      const sectionQuery = parts[1] || '';
-      
-      const targetSection = sectionQuery.split('section=')[1]?.split('&')[0];
-      const currentSection = searchParams.get('section');
-
-      return pathname === basePath && currentSection === targetSection;
-    }
-
-    return pathname === path;
-  };
-
-  const active = isActive();
+  const active = path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(`${path}/`);
 
   return (
     <li>
@@ -51,11 +28,11 @@ export default function SidebarItem({ title, path, number, icon, onClick }: Side
           }`}
       >
         {icon && (
-          <i className={`${icon} text-base mt-0.5 flex-shrink-0 ${active ? 'text-yellow-300' : 'text-gray-300 group-hover:text-white'}`}></i>
+          <i className={`${icon} text-base mt-0.5 shrink-0 ${active ? 'text-yellow-300' : 'text-gray-300 group-hover:text-white'}`}></i>
         )}
         
         {number !== undefined && (
-          <span className={`font-semibold flex-shrink-0 min-w-[20px] ${active ? 'text-yellow-300' : 'text-gray-300 group-hover:text-white'}`}>
+          <span className={`min-w-5 shrink-0 font-semibold ${active ? 'text-yellow-300' : 'text-gray-300 group-hover:text-white'}`}>
             {number}.
           </span>
         )}
