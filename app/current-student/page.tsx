@@ -14,7 +14,7 @@ const cards = [
         title: "Subject Registration",
         description:
             "Register your subjects for the current semester. Add or drop subjects according to your study plan.",
-        href: "/register/student-personal-info",
+        href: "/current-student/subject-registration",
         label: "Subject Registration",
     },
     {
@@ -61,11 +61,25 @@ export default function CurrentStudentPage() {
                             Manage your academic activities, registration and view your academic progress.
                         </p>
                     </div>
-                    <div
-                        aria-hidden="true"
-                        className="w-[180px] h-[90px] bg-gradient-to-br from-[#eee] to-white rounded-lg flex items-center justify-center text-[#999] text-xs shrink-0 sm:w-full sm:h-[140px] sm:max-w-full"
-                    >
-                        Campus Image
+
+                    
+                    <div className="shrink-0 w-[200px] bg-white rounded-xl border border-black/[0.06] shadow-[0_6px_18px_rgba(0,0,0,0.08)] p-4 flex flex-col items-center gap-2.5 sm:w-full sm:flex-row sm:justify-between">
+                        <div className="flex flex-col items-center gap-1.5 sm:flex-row sm:gap-3">
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#7a0b0b] to-[#c0392b] flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md">
+                                S
+                            </div>
+                            <div className="text-center sm:text-left">
+                                <p className="m-0 font-bold text-[#222] text-sm leading-tight">Student Name</p>
+                                <p className="m-0 text-[#7a0b0b] text-xs font-medium">RJT/TEC/2023/048</p>
+                                <p className="m-0 text-[#888] text-[11px]">Faculty of Technology</p>
+                            </div>
+                        </div>
+                        <Link
+                            href="/student-profile"
+                            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#7a0b0b] text-white font-semibold text-xs no-underline transition-all duration-200 hover:bg-[#5a0602] hover:shadow-[0_4px_12px_rgba(122,11,11,0.35)] whitespace-nowrap"
+                        >
+                            👤 View Profile
+                        </Link>
                     </div>
                 </section>
 

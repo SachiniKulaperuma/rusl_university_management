@@ -35,8 +35,8 @@ export default function SignIn() {
 
         setTimeout(() => {
             if (username.trim() === VALID_USERNAME && password === VALID_PASSWORD) {
-                setSuccess('Login successful! Redirecting to your profile…');
-                setTimeout(() => router.push('/student-profile'), 1000);
+                setSuccess('Login successful! Redirecting…');
+                setTimeout(() => router.push('/current-student'), 1000);
             } else {
                 setError('Invalid username or password. Please try again.');
                 setLoading(false);

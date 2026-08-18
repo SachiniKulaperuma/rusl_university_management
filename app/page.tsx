@@ -120,9 +120,9 @@ export default function Home() {
               </article>
 
               <article className="rounded-4xl border border-white/70 bg-white/95 p-6 text-left shadow-[0_18px_45px_rgba(15,23,42,0.12)] backdrop-blur">
-                <div className="flex flex-col items-center gap-3 text-center">
+                <div className="flex flex-col items-center gap-10 text-center">
                   <div className="flex items-center justify-center">
-                    <Image src="/current-student.png" alt="Current Student" width={90} height={90} />
+                    <Image src="/current-student.png" alt="Current Student" width={100} height={100} />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900">Current Student</h2>

@@ -23,7 +23,7 @@ const Navbar = () => {
           </button>
 
           <ul className="flex gap-8 items-center justify-end flex-1" id="nav-links">
-            <li><a href="#" className="text-gray-700 hover:text-blue-600 transition duration-200 active:text-blue-700" id="nl-home">Home</a></li>
+            <li><a href="/" className="text-gray-700 hover:text-blue-600 transition duration-200 active:text-blue-700" id="nl-home">Home</a></li>
             <li><a href="#about" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-about">About Us</a></li>
             <li><a href="/register" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-register">Register</a></li>
             <li><a href="#" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-staff">Staff</a></li>

@@ -68,51 +68,6 @@ export default function EditProfilePage() {
 
         {/* ── LEFT SIDEBAR ── */}
         <aside className="flex h-full shrink-0">
-          {/* Slim red bar */}
-          <div className="w-20 bg-gradient-to-b from-[#7C0A02] to-[#5a0602] flex flex-col items-center py-5 gap-5 shadow-[2px_0_8px_rgba(0,0,0,0.15)] shrink-0">
-            {/* Top section */}
-            <div className="flex flex-col items-center gap-6">
-              {/* Avatar */}
-              <div className="w-[60px] h-[60px] rounded-full overflow-hidden border-[3px] border-white/30 shadow-[0_4px_12px_rgba(0,0,0,0.2)] shrink-0">
-                <img
-                  src={avatarSrc}
-                  alt="User Avatar"
-                  className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).src = avatarFallback; }}
-                />
-              </div>
-              {/* Icon nav */}
-              <ul className="flex flex-col gap-4 list-none p-0 m-0">
-                {slimNavIcons.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href ?? "#"}
-                      title={item.label}
-                      className={[
-                        "w-10 h-10 flex items-center justify-center rounded-md text-[1.2rem] transition-all duration-250",
-                        item.id === "profile"
-                          ? "text-white bg-white/20"
-                          : "text-white/60 hover:text-white",
-                      ].join(" ")}
-                    >
-                      <i className={item.icon}></i>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            {/* Bottom settings */}
-            <div className="mt-auto">
-              <Link
-                href="#settings"
-                title="Settings"
-                className="w-10 h-10 flex items-center justify-center text-white/60 text-[1.2rem] rounded-md transition-all duration-250 hover:text-white hover:bg-white/10"
-              >
-                <i className="fas fa-cog"></i>
-              </Link>
-            </div>
-          </div>
-
           {/* Wide menu panel */}
           <div className="w-60 bg-white border-r border-[#ddd] flex flex-col overflow-y-auto shrink-0">
             {/* Back button */}
