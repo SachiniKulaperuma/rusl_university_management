@@ -149,13 +149,7 @@ export default function MedicalPage() {
     showToast('Form cleared across all tabs.');
   }
 
-  function AddRowBtn({ tableKey }: { tableKey: TableKey }) {
-    return (
-      <button type="button" className="btn-add-row" onClick={() => addRow(tableKey)}>
-        <i className="fas fa-plus"></i> Add Row
-      </button>
-    );
-  }
+  const renderAddRowBtn = (tableKey: TableKey, label = 'Add Row') => (<button type="button" className="btn-add-row" onClick={() => addRow(tableKey)}><i className="fas fa-plus"></i> {label}</button>);
 
   return (
     <>
@@ -290,7 +284,7 @@ export default function MedicalPage() {
                           <SportsRow key={row.id} tableKey="athletics" idx={idx + 1} canRemove={idx > 0} onRemove={() => removeRow('athletics', row.id)} />
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="athletics" />
+                    {renderAddRowBtn('athletics')}
 
                     <div className="sub-section-label" style={{ marginTop: 20 }}><i className="fas fa-chess"></i> (b) Indoor Games / Sport</div>
                     <table className="data-table"><thead><tr>
@@ -301,7 +295,7 @@ export default function MedicalPage() {
                           <SportsRow key={row.id} tableKey="indoor" idx={idx + 1} canRemove={idx > 0} onRemove={() => removeRow('indoor', row.id)} />
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="indoor" />
+                    {renderAddRowBtn('indoor')}
 
                     <div className="sub-section-label" style={{ marginTop: 20 }}><i className="fas fa-football"></i> (c) Outdoor Games / Sports</div>
                     <table className="data-table"><thead><tr>
@@ -312,7 +306,7 @@ export default function MedicalPage() {
                           <SportsRow key={row.id} tableKey="outdoor" idx={idx + 1} canRemove={idx > 0} onRemove={() => removeRow('outdoor', row.id)} />
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="outdoor" />
+                    {renderAddRowBtn('outdoor')}
                   </div>
                 )}
 
@@ -328,7 +322,7 @@ export default function MedicalPage() {
                           <ArtDanceRow key={row.id} tableKey="art" idx={idx + 1} canRemove={idx > 0} onRemove={() => removeRow('art', row.id)} />
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="art" />
+                    {renderAddRowBtn('art')}
 
                     <div className="form-section-title" style={{ marginTop: 28 }}><i className="fas fa-music"></i> 05. Music Skills</div>
                     <div className="sub-section-label"><i className="fas fa-guitar"></i> 1. Skills related to playing instruments</div>
@@ -349,7 +343,7 @@ export default function MedicalPage() {
                           </tr>
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="instruments" />
+                    {renderAddRowBtn('instruments')}
 
                     <div className="sub-section-label" style={{ marginTop: 20 }}><i className="fas fa-microphone"></i> 2. Singing Skill</div>
                     <table className="data-table"><thead><tr>
@@ -367,7 +361,7 @@ export default function MedicalPage() {
                           </tr>
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="singing" />
+                    {renderAddRowBtn('singing')}
                     <div className="field-row" style={{ marginTop: 10 }}>
                       <div className="field-group" style={{ flexDirection: 'row', alignItems: 'center', background: '#f5eeea', padding: '8px 14px', borderRadius: 4 }}>
                         <label className="field-label" style={{ margin: 0, marginRight: 10, whiteSpace: 'nowrap' }}>Singing medium:</label>
@@ -384,7 +378,7 @@ export default function MedicalPage() {
                           <ArtDanceRow key={row.id} tableKey="dancing" idx={idx + 1} canRemove={idx > 0} onRemove={() => removeRow('dancing', row.id)} />
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="dancing" />
+                    {renderAddRowBtn('dancing')}
                   </div>
                 )}
 
@@ -410,7 +404,7 @@ export default function MedicalPage() {
                           </tr>
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="performing" />
+                    {renderAddRowBtn('performing')}
 
                     <div className="form-section-title" style={{ marginTop: 28 }}><i className="fas fa-calendar-check"></i> 08. Any events, exhibitions, drama you have organized under No. 3, 4, 5, 6, 7</div>
                     <table className="data-table"><thead><tr>
@@ -431,7 +425,7 @@ export default function MedicalPage() {
                           </tr>
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="organized" />
+                    {renderAddRowBtn('organized')}
 
                     <div className="form-section-title" style={{ marginTop: 28 }}><i className="fas fa-comment-dots"></i> 09. Oratory Skills</div>
                     <table className="data-table"><thead><tr>
@@ -452,7 +446,7 @@ export default function MedicalPage() {
                           </tr>
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="oratory" />
+                    {renderAddRowBtn('oratory')}
 
                     <div className="form-section-title" style={{ marginTop: 28 }}><i className="fas fa-users-rectangle"></i> 10. Leadership – Positions held in committees, associations in school and village</div>
                     <table className="data-table"><thead><tr>
@@ -473,7 +467,7 @@ export default function MedicalPage() {
                           </tr>
                         ))}
                       </tbody></table>
-                    <AddRowBtn tableKey="leadership" />
+                    {renderAddRowBtn('leadership')}
                   </div>
                 )}
 

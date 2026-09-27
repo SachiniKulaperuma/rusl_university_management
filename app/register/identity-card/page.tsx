@@ -402,7 +402,7 @@ export default function IdentityCardPage() {
           <div className="field-row">
             <div className="field-group half">
               <label className="field-label" htmlFor="idc-reg-no"><span className="field-num">1.</span> Registration No</label>
-              <input type="text" id="idc-reg-no" name="reg_no" className="field-input" placeholder="e.g. 2026/ICT/001" required/>
+              <input type="text" id="idc-reg-no" name="reg_no" className="field-input" placeholder="e.g. ITT/2023/076, ENT/2023/076, or BST/2023/076" required/>
             </div>
             <div className="field-group half">
               <label className="field-label" htmlFor="idc-adm-year"><span className="field-num">2.</span> Admission Year</label>
@@ -424,16 +424,9 @@ export default function IdentityCardPage() {
               <label className="field-label" htmlFor="idc-course"><span className="field-num">4.</span> Selected Course of Study</label>
               <select id="idc-course" name="course" className="field-input" required>
                 <option value="">-- Select Course --</option>
-                <option>B.Sc. in Information &amp; Communication Technology</option>
-                <option>B.Sc. in Agricultural Technology &amp; Management</option>
-                <option>B.Sc. in Agriculture</option>
-                <option>B.Sc. in Food Science &amp; Technology</option>
-                <option>B.Sc. in Nursing</option>
-                <option>B.A. in Social Sciences</option>
-                <option>B.A. in Management</option>
-                <option>LLB (Bachelor of Laws)</option>
-                <option>MBBS</option>
-                <option>B.Sc. in Engineering Technology</option>
+                <option>B.ET</option>
+                <option>B.BST</option>
+                <option>B.ICT</option>
               </select>
             </div>
           </div>

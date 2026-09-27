@@ -19,7 +19,7 @@ const quickAccessItems = [
   {
     title: 'Exam Admission',
     description: 'Apply for exams',
-    href: '/register/medical',
+    href: '/current-student/exam-admission',
     icon: 'fas fa-file-circle-check',
     accent: 'from-emerald-500 to-green-600',
   },

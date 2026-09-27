@@ -117,19 +117,7 @@ export default function SkillPage() {
     leadership: setLeadershipRows,
   };
 
-  const rowMap: Record<TableKey, RowData[]> = {
-    athletics: athleticsRows,
-    indoor: indoorRows,
-    outdoor: outdoorRows,
-    art: artRows,
-    instruments: instrumentsRows,
-    singing: singingRows,
-    dancing: dancingRows,
-    performing: performingRows,
-    organized: organizedRows,
-    oratory: oratoryRows,
-    leadership: leadershipRows,
-  };
+  
 
   function addRow(key: TableKey) {
     counters.current[key]++;
@@ -201,13 +189,7 @@ export default function SkillPage() {
   }
 
   /* ── reusable AddRow button ── */
-  function AddRowBtn({ tableKey, label = 'Add Row' }: { tableKey: TableKey; label?: string }) {
-    return (
-      <button type="button" className="btn-add-row" onClick={() => addRow(tableKey)}>
-        <i className="fas fa-plus"></i> {label}
-      </button>
-    );
-  }
+  const renderAddRowBtn = (tableKey: TableKey, label = 'Add Row') => (<button type="button" className="btn-add-row" onClick={() => addRow(tableKey)}><i className="fas fa-plus"></i> {label}</button>);
 
   return (
     <>
@@ -362,7 +344,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="athletics" />
+                    {renderAddRowBtn('athletics')}
 
                     {/* (b) Indoor */}
                     <div className="sub-section-label" style={{ marginTop: 20 }}>
@@ -386,7 +368,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="indoor" />
+                    {renderAddRowBtn('indoor')}
 
                     {/* (c) Outdoor */}
                     <div className="sub-section-label" style={{ marginTop: 20 }}>
@@ -410,7 +392,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="outdoor" />
+                    {renderAddRowBtn('outdoor')}
                   </div>
                 )}
 
@@ -438,7 +420,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="art" />
+                    {renderAddRowBtn('art')}
 
                     {/* 05. Music */}
                     <div className="form-section-title" style={{ marginTop: 28 }}>
@@ -476,7 +458,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="instruments" />
+                    {renderAddRowBtn('instruments')}
 
                     <div className="sub-section-label" style={{ marginTop: 20 }}>
                       <i className="fas fa-microphone"></i> 2. Singing Skill
@@ -507,7 +489,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="singing" />
+                    {renderAddRowBtn('singing')}
 
                     <div className="field-row" style={{ marginTop: 10 }}>
                       <div className="field-group" style={{ flexDirection: 'row', alignItems: 'center', background: '#f5eeea', padding: '8px 14px', borderRadius: 4 }}>
@@ -537,7 +519,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="dancing" />
+                    {renderAddRowBtn('dancing')}
                   </div>
                 )}
 
@@ -578,7 +560,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="performing" />
+                    {renderAddRowBtn('performing')}
 
                     {/* 08. Organized */}
                     <div className="form-section-title" style={{ marginTop: 28 }}>
@@ -614,7 +596,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="organized" />
+                    {renderAddRowBtn('organized')}
 
                     {/* 09. Oratory */}
                     <div className="form-section-title" style={{ marginTop: 28 }}>
@@ -650,7 +632,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="oratory" />
+                    {renderAddRowBtn('oratory')}
 
                     {/* 10. Leadership */}
                     <div className="form-section-title" style={{ marginTop: 28 }}>
@@ -686,7 +668,7 @@ export default function SkillPage() {
                         ))}
                       </tbody>
                     </table>
-                    <AddRowBtn tableKey="leadership" />
+                    {renderAddRowBtn('leadership')}
                   </div>
                 )}
 

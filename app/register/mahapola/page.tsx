@@ -734,7 +734,7 @@ export default function MahapolaPage() {
                                 This application must be duly completed, and handed over to the Grama Niladhari of the area with the
                                 relevant documents to enable him to be received on or before the deadline specified in the covering
                                 letter of enrolment. The Grama Niladhari will (as per cage VIII) send it through the Divisional Secretary
-                                in time as required. As the Mahapola form needs to be sent by registered post, an envelope (6"×9") stamped
+                                in time as required. As the Mahapola form needs to be sent by registered post, an envelope (6&quot;×9&quot;) stamped
                                 to the value of <strong>Rs. 55.00</strong> (or postage according to the weight) on which the University
                                 address written must be handed over to Grama Niladhari with application form. Under no circumstances
                                 must the application form be returned by the applicant.

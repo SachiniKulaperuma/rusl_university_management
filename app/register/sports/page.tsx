@@ -114,17 +114,6 @@ export default function SportsPage() {
     error: false,
   });
   const [submitting, setSubmitting] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState<{ name: string; role: string } | null>(null);
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem('rusl_user');
-    if (!stored) return;
-    try {
-      setLoggedInUser(JSON.parse(stored));
-    } catch {
-      sessionStorage.removeItem('rusl_user');
-    }
-  }, []);
 
   useEffect(() => {
     if (!toast.visible) return;
@@ -170,10 +159,6 @@ export default function SportsPage() {
     }, 1200);
   };
 
-  const logoutUser = () => {
-    sessionStorage.removeItem('rusl_user');
-    window.location.href = '/signin.html';
-  };
 
   return (
     <>
@@ -226,7 +211,7 @@ export default function SportsPage() {
           <div className="form-card">
             <div className="form-card-header">
               <i className="fas fa-trophy"></i>
-              <h2>Students' Physical Attributes & Sport Achievements</h2>
+              <h2>Students&apos; Physical Attributes &amp; Sport Achievements</h2>
             </div>
             <form ref={formRef} noValidate onSubmit={handleSubmit}>
               <div className="form-body">

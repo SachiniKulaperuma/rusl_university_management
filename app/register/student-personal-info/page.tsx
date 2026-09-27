@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 export default function StudentRegistration() {
 	// --- State Variables ---
@@ -30,15 +30,58 @@ export default function StudentRegistration() {
 		}
 	};
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 
-		setTimeout(() => {
+		const getValue = (id: string) => (document.getElementById(id) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)?.value || '';
+
+		const payload = {
+			student_id: getValue('reg-no'),
+			nic_no: getValue('nic-no'),
+			al_index_year: getValue('al-index'),
+			course_of_study: getValue('course'),
+			name_with_initials: getValue('name-initials'),
+			full_name: getValue('full-name'),
+			telephone_no: getValue('tel-no'),
+			email: getValue('email-addr'),
+			permanent_address: getValue('perm-addr'),
+			contact_address: getValue('contact-addr'),
+			grama_niladhari: getValue('grama'),
+			district: getValue('district'),
+			race: getValue('race'),
+			religion: getValue('religion'),
+			gender: getValue('gender'),
+			civil_status: getValue('civil-status'),
+			citizenship: getValue('citizenship'),
+			guardian_name: getValue('guardian-name'),
+			guardian_occupation: getValue('guardian-occ'),
+			guardian_work_address: getValue('guardian-work'),
+			guardian_telephone: getValue('guardian-tel'),
+			guardian_relationship: getValue('guardian-rel'),
+			emergency_name: getValue('emg-name'),
+			emergency_telephone: getValue('emg-tel')
+		};
+
+		try {
+			const res = await fetch('http://localhost:5000/api/auth/register', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload)
+			});
+			const data = await res.json();
+			if (res.ok) {
+				setShowToast(true);
+				setTimeout(() => setShowToast(false), 4000);
+				handleClear(); // Clear the form on success
+			} else {
+				alert('Error: ' + (data.error || 'Registration failed'));
+			}
+		} catch {
+			alert('Failed to connect to the server.');
+		} finally {
 			setIsSubmitting(false);
-			setShowToast(true);
-			setTimeout(() => setShowToast(false), 4000);
-		}, 1500);
+		}
 	};
 
 	const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-md font-sans text-sm text-gray-800 bg-[#faf9f7] outline-none transition-all focus:border-[#7C0A02] focus:ring-3 focus:ring-[#7C0A02]/10 focus:bg-white";
@@ -73,7 +116,7 @@ export default function StudentRegistration() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div className="flex flex-col gap-1.5">
 								<label className={labelClass} htmlFor="reg-no"><span className="font-bold text-[#7C0A02] mr-1">1.</span> Registration No</label>
-								<input type="text" id="reg-no" className={inputClass} placeholder="e.g. 2026/ICT/001" />
+								<input type="text" id="reg-no" className={inputClass} placeholder="e.g. ITT/2023/076, ENT/2023/076, or BST/2023/076" />
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className={labelClass} htmlFor="nic-no"><span className="font-bold text-[#7C0A02] mr-1">2.</span> National Identity Card or Passport No</label>
@@ -87,16 +130,9 @@ export default function StudentRegistration() {
 								<label className={labelClass} htmlFor="course"><span className="font-bold text-[#7C0A02] mr-1">4.</span> Selected Course of Study</label>
 								<select id="course" className={`${inputClass} cursor-pointer`} required>
 									<option value="">-- Select Course --</option>
-									<option>B.Sc. in Information &amp; Communication Technology</option>
-									<option>B.Sc. in Agricultural Technology &amp; Management</option>
-									<option>B.Sc. in Agriculture</option>
-									<option>B.Sc. in Food Science &amp; Technology</option>
-									<option>B.Sc. in Nursing</option>
-									<option>B.A. in Social Sciences</option>
-									<option>B.A. in Management</option>
-									<option>LLB (Bachelor of Laws)</option>
-									<option>MBBS</option>
-									<option>B.Sc. in Engineering Technology</option>
+									<option>B.ET</option>
+									<option>B.BST</option>
+									<option>B.ICT</option>
 								</select>
 							</div>
 							<div className="flex flex-col gap-1.5">
@@ -336,7 +372,7 @@ export default function StudentRegistration() {
 								</div>
 								<div className="flex flex-col gap-1.5">
 									<label className={labelClass}>Relationship to the Student</label>
-									<select className={`${inputClass} cursor-pointer`}>
+									<select id="guardian-rel" className={`${inputClass} cursor-pointer`}>
 										<option value="">-- Select --</option>
 										<option>Mother</option><option>Father</option><option>Guardian</option>
 										<option>Sibling</option><option>Other</option>

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function HeaderTop() {
@@ -33,7 +34,7 @@ export default function HeaderTop() {
                 <div style={{ width: 110, flexShrink: 0 }} />
 
                 {/* ── CENTRE: logo + text ── */}
-                <a
+                <Link
                     href="/"
                     id="header-logo"
                     style={{
@@ -88,12 +89,12 @@ export default function HeaderTop() {
                             Rajarata University of Sri Lanka
                         </span>
                     </div>
-                </a>
+                </Link>
 
                 {/* ── RIGHT: Login button ── */}
                 {!isSignInPage && (
                     <div style={{ flexShrink: 0 }}>
-                        <a
+                        <Link
                             href="/signin"
                             id="header-login-btn"
                             style={{
@@ -122,7 +123,7 @@ export default function HeaderTop() {
                         >
                             <i className="fas fa-user" style={{ fontSize: '0.78rem' }} />
                             Login
-                        </a>
+                        </Link>
                     </div>
                 )}
             </div>

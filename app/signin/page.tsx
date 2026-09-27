@@ -3,10 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-// ── Login credentials ──────────────────────────
-const VALID_USERNAME = 'student';
-const VALID_PASSWORD = 'student123';
-// ──────────────────────────────────────────────
+// Removed hardcoded credentials as we use the real backend now
 
 export default function SignIn() {
     const router = useRouter();
@@ -21,7 +18,7 @@ export default function SignIn() {
         setShowPassword(!showPassword);
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError('');
         setSuccess('');
@@ -33,15 +30,28 @@ export default function SignIn() {
 
         setLoading(true);
 
-        setTimeout(() => {
-            if (username.trim() === VALID_USERNAME && password === VALID_PASSWORD) {
+        try {
+            const response = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: username.trim(), password })
+            });
+            const data = await response.json();
+
+            if (response.ok) {
                 setSuccess('Login successful! Redirecting…');
+                // Save token and user details to localStorage
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('student', JSON.stringify(data.student));
                 setTimeout(() => router.push('/current-student'), 1000);
             } else {
-                setError('Invalid username or password. Please try again.');
+                setError(data.error || 'Invalid username or password. Please try again.');
                 setLoading(false);
             }
-        }, 600);
+        } catch {
+            setError('Failed to connect to the server. Please try again later.');
+            setLoading(false);
+        }
     };
 
     return (

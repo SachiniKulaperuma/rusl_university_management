@@ -1,9 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function StudentProfilePage() {
   const [activeNav, setActiveNav] = useState("profile");
+
+  const [student, setStudent] = useState<any>({
+    full_name: "Sachini Kulaperuma",
+    student_id: "RJT2024001",
+    gender: "Female",
+    citizenship: "Sri Lankan",
+    nic_no: "200315021234V",
+    telephone_no: "+94 77 123 4567",
+    email: "sachini@rjt.ac.lk",
+    permanent_address: "123 Main Street, Colombo 7, Sri Lanka",
+    district: "Colombo",
+    guardian_name: "Ravi Kulaperuma",
+    guardian_relationship: "Father",
+    guardian_telephone: "+94 71 234 5678",
+    guardian_work_address: "123 Main Street, Colombo 7, Sri Lanka",
+    guardian_occupation: "Engineer"
+  });
+
+  useEffect(() => {
+    const studentStr = localStorage.getItem("student");
+    if (studentStr) {
+      try {
+        const studentData = JSON.parse(studentStr);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setStudent((prev: any) => ({ ...prev, ...studentData }));
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  }, []);
 
   const navItems = [
     { id: "profile", icon: "fas fa-user", label: "Profile" },
@@ -50,16 +81,16 @@ export default function StudentProfilePage() {
           {/* Avatar */}
           <div className="shrink-0">
             <div className="w-[140px] h-[140px] rounded-lg bg-gradient-to-br from-[#7C0A02] to-[#5a0602] flex items-center justify-center text-white text-5xl shadow-[0_4px_12px_rgba(124,10,2,0.2)] overflow-hidden">
-              <i className="fas fa-user"></i>
+              {student.full_name ? student.full_name.charAt(0).toUpperCase() : <i className="fas fa-user"></i>}
             </div>
           </div>
           {/* Info */}
           <div className="flex-1 pt-2">
             <h1 className="text-[1.9rem] text-[#222] m-0 mb-2 font-bold">
-              Sachini Kulaperuma
+              {student.full_name || student.name_with_initials}
             </h1>
             <p className="text-[#888] text-[0.95rem] m-0">
-              Student ID: RJT2024001
+              Student ID: {student.student_id}
             </p>
             <div className="flex gap-3 mt-4">
               <button className="px-5 py-[10px] bg-[#7C0A02] text-white rounded-md text-[0.9rem] font-semibold cursor-pointer transition-all duration-250 hover:bg-[#5a0602] hover:shadow-[0_2px_8px_rgba(124,10,2,0.3)] border-none">
@@ -77,11 +108,11 @@ export default function StudentProfilePage() {
           {/* PERSONAL INFORMATION */}
           <InfoSection title="Personal Information" icon="fas fa-id-card">
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem label="Full Name" value="Sachini Kulaperuma" />
-              <InfoItem label="Date of Birth" value="15/03/2003" />
-              <InfoItem label="Gender" value="Female" />
-              <InfoItem label="Nationality" value="Sri Lankan" />
-              <InfoItem label="NIC Number" value="200315021234V" />
+              <InfoItem label="Full Name" value={student.full_name || student.name_with_initials} />
+              <InfoItem label="Date of Birth" value="N/A" />
+              <InfoItem label="Gender" value={student.gender} />
+              <InfoItem label="Nationality" value={student.citizenship || student.race} />
+              <InfoItem label="NIC Number" value={student.nic_no} />
               <InfoItem label="Passport Number" value="N/A" />
             </div>
           </InfoSection>
@@ -89,24 +120,24 @@ export default function StudentProfilePage() {
           {/* CONTACT INFORMATION */}
           <InfoSection title="Contact Information" icon="fas fa-address-card">
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem label="Mobile Number" value="+94 77 123 4567" />
-              <InfoItem label="Email Address" value="sachini@rjt.ac.lk" />
-              <InfoItem label="Permanent Address" value="123 Main Street, Colombo 7, Sri Lanka" />
-              <InfoItem label="Postal Code" value="00700" />
-              <InfoItem label="City" value="Colombo" />
-              <InfoItem label="District" value="Colombo" />
+              <InfoItem label="Mobile Number" value={student.telephone_no} />
+              <InfoItem label="Email Address" value={student.email} />
+              <InfoItem label="Permanent Address" value={student.permanent_address} />
+              <InfoItem label="Postal Code" value="N/A" />
+              <InfoItem label="City" value={student.district} />
+              <InfoItem label="District" value={student.district} />
             </div>
           </InfoSection>
 
           {/* GUARDIAN INFORMATION */}
           <InfoSection title="Guardian Information" icon="fas fa-users">
             <div className="grid grid-cols-2 gap-4">
-              <InfoItem label="Guardian Name" value="Ravi Kulaperuma" />
-              <InfoItem label="Relationship" value="Father" />
-              <InfoItem label="Guardian Contact" value="+94 71 234 5678" />
-              <InfoItem label="Guardian Email" value="ravi.k@example.com" />
-              <InfoItem label="Guardian Address" value="123 Main Street, Colombo 7, Sri Lanka" />
-              <InfoItem label="Guardian Occupation" value="Engineer" />
+              <InfoItem label="Guardian Name" value={student.guardian_name} />
+              <InfoItem label="Relationship" value={student.guardian_relationship} />
+              <InfoItem label="Guardian Contact" value={student.guardian_telephone} />
+              <InfoItem label="Guardian Email" value="N/A" />
+              <InfoItem label="Guardian Address" value={student.guardian_work_address} />
+              <InfoItem label="Guardian Occupation" value={student.guardian_occupation} />
             </div>
           </InfoSection>
         </div>

@@ -1,41 +1,79 @@
+"use client";
+
 import Link from "next/link";
-import type { Metadata } from "next";
+import { useEffect, useState } from "react";
 
-export const metadata: Metadata = {
-    title: "Current Student — RUSL Student Portal",
-    description:
-        "Manage your academic activities, registration and view your academic progress at Rajarata University of Sri Lanka.",
-};
-
-const cards = [
-    {
-        id: "subject-title",
-        emoji: "📚",
-        title: "Subject Registration",
-        description:
-            "Register your subjects for the current semester. Add or drop subjects according to your study plan.",
-        href: "/current-student/subject-registration",
-        label: "Subject Registration",
-    },
-    {
-        id: "exam-title",
-        emoji: "📝",
-        title: "Exam Registration",
-        description:
-            "Register for your semester exams. Select the exams you wish to appear and submit your registration.",
-        href: "#",
-        label: " Exam Registration",
-    },
-];
-
-const infoItems = [
-    { emoji: "📅", label: "Academic Year", value: "2024/2025" },
-    { emoji: "🏷️", label: "Semester", value: "Semester 1" },
-    { emoji: "🕒", label: "Registration Period", value: "01 May 2024 – 14 May 2024" },
-    { emoji: "🆔", label: "Student ID", value: "RJT/TEC/2023/048" },
-];
+// Metadata removed because this is a client component
 
 export default function CurrentStudentPage() {
+    const [studentName, setStudentName] = useState("Student Name");
+    const [studentId, setStudentId] = useState("RJT/TEC/2023/048");
+    const [studentInitial, setStudentInitial] = useState("S");
+    const [courseOfStudy, setCourseOfStudy] = useState("Faculty of Technology");
+
+    useEffect(() => {
+        // Read the logged-in student data from localStorage
+        const studentStr = localStorage.getItem("student");
+        if (studentStr) {
+            try {
+                const studentData = JSON.parse(studentStr);
+                
+                // Update Name
+                if (studentData.name_with_initials) {
+                    // eslint-disable-next-line react-hooks/set-state-in-effect
+                    setStudentName(studentData.name_with_initials);
+                    setStudentInitial(studentData.name_with_initials.charAt(0).toUpperCase());
+                } else if (studentData.full_name) {
+                    // eslint-disable-next-line react-hooks/set-state-in-effect
+                    setStudentName(studentData.full_name);
+                    setStudentInitial(studentData.full_name.charAt(0).toUpperCase());
+                }
+                
+                // Update ID
+                if (studentData.student_id) {
+                    // eslint-disable-next-line react-hooks/set-state-in-effect
+                    setStudentId(studentData.student_id);
+                }
+                
+                // Update Course / Faculty
+                if (studentData.course_of_study) {
+                    // eslint-disable-next-line react-hooks/set-state-in-effect
+                    setCourseOfStudy(studentData.course_of_study);
+                }
+            } catch (error) {
+                console.error("Failed to parse student data", error);
+            }
+        }
+    }, []);
+
+    const cards = [
+        {
+            id: "subject-title",
+            emoji: "📚",
+            title: "Subject Registration",
+            description:
+                "Register your subjects for the current semester. Add or drop subjects according to your study plan.",
+            href: "/current-student/subject-registration",
+            label: "Subject Registration",
+        },
+        {
+            id: "exam-title",
+            emoji: "📝",
+            title: "Exam Registration",
+            description:
+                "Register for your semester exams. Select the exams you wish to appear and submit your registration.",
+            href: "/current-student/exam-admission",
+            label: " Exam Registration",
+        },
+    ];
+
+    const infoItems = [
+        { emoji: "📅", label: "Academic Year", value: "2024/2025" },
+        { emoji: "🏷️", label: "Semester", value: "Semester 1" },
+        { emoji: "🕒", label: "Registration Period", value: "01 May 2024 – 14 May 2024" },
+        { emoji: "🆔", label: "Student ID", value: studentId },
+    ];
+
     return (
         <div className="min-h-[calc(100vh-77px)] bg-gradient-to-b from-white to-[#fafafa] text-[#222] antialiased leading-[1.45]">
             <div className="max-w-[1100px] mx-auto px-5 py-7">
@@ -66,12 +104,12 @@ export default function CurrentStudentPage() {
                     <div className="shrink-0 w-[200px] bg-white rounded-xl border border-black/[0.06] shadow-[0_6px_18px_rgba(0,0,0,0.08)] p-4 flex flex-col items-center gap-2.5 sm:w-full sm:flex-row sm:justify-between">
                         <div className="flex flex-col items-center gap-1.5 sm:flex-row sm:gap-3">
                             <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#7a0b0b] to-[#c0392b] flex items-center justify-center text-white text-2xl font-bold shrink-0 shadow-md">
-                                S
+                                {studentInitial}
                             </div>
                             <div className="text-center sm:text-left">
-                                <p className="m-0 font-bold text-[#222] text-sm leading-tight">Student Name</p>
-                                <p className="m-0 text-[#7a0b0b] text-xs font-medium">RJT/TEC/2023/048</p>
-                                <p className="m-0 text-[#888] text-[11px]">Faculty of Technology</p>
+                                <p className="m-0 font-bold text-[#222] text-sm leading-tight">{studentName}</p>
+                                <p className="m-0 text-[#7a0b0b] text-xs font-medium">{studentId}</p>
+                                <p className="m-0 text-[#888] text-[11px]">{courseOfStudy}</p>
                             </div>
                         </div>
                         <Link

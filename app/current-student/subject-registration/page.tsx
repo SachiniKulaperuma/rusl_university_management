@@ -1,20 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-const compulsorySubjects = [
-    { code: 'ICT 3201', title: 'Rapid Application Development', credits: 3 },
-    { code: 'ICT 3202', title: 'Advanced Database Management Systems', credits: 3 },
-    { code: 'ICT 3203', title: 'Data Mining & Knowledge Analytics', credits: 2 },
-];
 
-const optionalSubjects = [
-    { id: 'opt1', code: 'ICT 3305', title: 'Advanced Computer Networks Architecture', credits: 3 },
-    { id: 'opt2', code: 'ICT 3206', title: 'Human-Computer Interaction Frameworks', credits: 2 },
-];
 
-const COMP_CREDITS = compulsorySubjects.reduce((s, c) => s + c.credits, 0);
+
+
 
 const sidebarLinks = [
     { id: 'subjects', label: 'Subject Registration', href: '/signin/current-student/subject-registration', active: true, d: 'M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z' },
@@ -35,6 +28,31 @@ function Tick({ color = 'white' }: { color?: string }) {
 
 export default function SubjectRegistrationPage() {
     const [view, setView] = useState<View>('selection');
+    const [compulsorySubjects, setCompulsorySubjects] = useState<any[]>([]);
+    const [optionalSubjects, setOptionalSubjects] = useState<any[]>([]);
+    const [loadingSubjects, setLoadingSubjects] = useState(true);
+    const [studentInfo, setStudentInfo] = useState<any>(null);
+
+    useEffect(() => {
+        const stored = localStorage.getItem('student');
+        if (stored) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setStudentInfo(JSON.parse(stored));
+        }
+        
+        fetch('http://localhost:5000/api/subjects/all')
+            .then(res => res.json())
+            .then(data => {
+                // Hardcoding Year 1 Sem 1 for B.ICT for now
+                const filtered = data.filter((s: any) => s.academic_year === 1 && s.semester === 1 && s.department === 'B.ICT');
+                setCompulsorySubjects(filtered.filter((s: any) => s.course_status && s.course_status.startsWith('C')).map((s: any) => ({ id: s.subject_id, code: s.subject_code, title: s.subject_name, credits: s.credit_value })));
+                setOptionalSubjects(filtered.filter((s: any) => s.course_status === 'O').map((s: any) => ({ id: s.subject_id, code: s.subject_code, title: s.subject_name, credits: s.credit_value })));
+                setLoadingSubjects(false);
+            })
+            .catch(err => console.error(err));
+    }, []);
+
+    const COMP_CREDITS = compulsorySubjects.reduce((sum, s) => sum + s.credits, 0);
     const [selected, setSelected] = useState<Record<string, boolean>>({});
     const [declared, setDeclared] = useState(false);
 
@@ -43,6 +61,40 @@ export default function SubjectRegistrationPage() {
     const totalCredits = COMP_CREDITS + optCredits;
 
     const toggle = (id: string) => setSelected(p => ({ ...p, [id]: !p[id] }));
+
+    const handleRegistration = async () => {
+        if (!studentInfo || !declared) return;
+        setView('pending');
+        
+        try {
+            const allSubjectIds = [
+                ...compulsorySubjects.map(s => s.id),
+                ...optionalSubjects.filter(s => selected[s.id]).map(s => s.id)
+            ];
+
+            // Send sequentially or in parallel
+            for (const subjectId of allSubjectIds) {
+                await fetch('http://localhost:5000/api/registrations/enroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        student_id: studentInfo.student_id,
+                        subject_id: subjectId,
+                        academic_year: '2025/2026'
+                    })
+                });
+            }
+            
+            setTimeout(() => {
+                setView('confirmed');
+            }, 1000);
+        } catch (err) {
+            console.error('Registration error:', err);
+            alert('An error occurred during registration. Please try again.');
+            setView('selection');
+        }
+    };
+
 
     const tabLabels: { key: View; label: string }[] = [
         { key: 'selection', label: '1. Subject Selection' },
@@ -62,8 +114,8 @@ export default function SubjectRegistrationPage() {
                         </svg>
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-slate-800">W. M. K. S. Bandara</p>
-                        <p className="text-xs text-slate-500">ICT/2021/2022/048</p>
+                        <p className="text-sm font-bold text-slate-800">{studentInfo?.name_with_initials || "W. M. K. S. Bandara"}</p>
+                        <p className="text-xs text-slate-500">{studentInfo?.student_id || "ICT/2021/2022/048"}</p>
                     </div>
                     <span className="text-xs font-bold text-[#7A0016] border border-[#7A0016] bg-rose-50 rounded-full px-3 py-0.5">Active Student</span>
                 </div>
@@ -274,7 +326,7 @@ export default function SubjectRegistrationPage() {
                                     </p>
                                     <button
                                         disabled={!declared}
-                                        onClick={() => { if (declared) setView('pending'); }}
+                                        onClick={handleRegistration}
                                         className={['w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200',
                                             declared ? 'bg-[#7A0016] text-white hover:bg-[#5c0010] hover:shadow-lg hover:-translate-y-0.5 cursor-pointer' : 'bg-[#7A0016]/40 text-white cursor-not-allowed',
                                         ].join(' ')}>
