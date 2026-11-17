@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { adminFetch } from "../adminFetch";
 
 interface Student {
   student_id: string;
@@ -20,7 +21,7 @@ export default function AdminStudentsPage() {
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/students");
+      const res = await adminFetch("http://localhost:5000/api/admin/students");
       const data = await res.json();
       if (data.success) {
         setStudents(data.students);
@@ -41,7 +42,7 @@ export default function AdminStudentsPage() {
   const handleApprove = async (id: string) => {
     if (!confirm(`Are you sure you want to approve student ${id}?`)) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/students/${encodeURIComponent(id)}/approve`, { method: 'PUT' });
+      const res = await adminFetch(`http://localhost:5000/api/admin/students/${encodeURIComponent(id)}/approve`, { method: 'PUT' });
       const data = await res.json();
       if (data.success) {
         setStudents(students.map(s => s.student_id === id ? { ...s, status: 'Approved' } : s));
@@ -56,7 +57,7 @@ export default function AdminStudentsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm(`WARNING: Are you sure you want to permanently delete student ${id}?`)) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/students/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      const res = await adminFetch(`http://localhost:5000/api/admin/students/${encodeURIComponent(id)}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setStudents(students.filter(s => s.student_id !== id));

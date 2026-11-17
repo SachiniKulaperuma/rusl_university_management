@@ -54,6 +54,8 @@ CREATE TABLE Subject (
     Subject_Name VARCHAR(100) NOT NULL,
     Credit_Value INT NOT NULL,
     Semester INT NOT NULL,
+    Academic_Year INT,
+    Course_Status VARCHAR(20),
     Department VARCHAR(100)
 );
 

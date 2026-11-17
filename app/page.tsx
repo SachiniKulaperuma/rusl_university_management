@@ -46,18 +46,28 @@ const quickAccessItems = [
   },
 ];
 
-const announcements = [
-  {
-    label: 'New',
-    title: 'Semester Registration',
-    description: 'Registration window is open for the new semester.',
-  },
-  {
-    label: 'Info',
-    title: 'Exam Timetable Released',
-    description: 'The updated examination timetable is now available.',
-  },
-];
+type Announcement = {
+  announcement_id: number;
+  title: string;
+  description: string;
+  publication_date: string;
+};
+
+async function getLatestAnnouncements(): Promise<Announcement[]> {
+  try {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const response = await fetch(`${backendUrl}/api/announcements`, { cache: 'no-store' });
+    if (!response.ok) return [];
+    const data = await response.json();
+    return Array.isArray(data.announcements) ? data.announcements : [];
+  } catch {
+    return [];
+  }
+}
+
+function formatAnnouncementDate(value: string) {
+  return new Intl.DateTimeFormat('en-LK', { dateStyle: 'medium' }).format(new Date(value));
+}
 
 const featureList = [
   'Fast Registration',
@@ -76,7 +86,9 @@ const footerLinks = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const announcements = await getLatestAnnouncements();
+
   return (
     <main className="bg-[#f5efe7] text-slate-900">
       <section className="relative overflow-hidden">
@@ -187,15 +199,15 @@ export default function Home() {
             </div>
 
             <div className="mt-5 space-y-4">
-              {announcements.map((item) => (
-                <article key={item.title} className="rounded-2xl border border-slate-200 px-4 py-4">
-                  <div className="flex items-center gap-3">
-                    <span className="rounded-full bg-amber-500 px-3 py-1 text-xs font-bold text-white">
-                      {item.label}
-                    </span>
+              {announcements.length === 0 ? (
+                <p className="rounded-2xl border border-slate-200 px-4 py-4 text-sm text-slate-600">No announcements available at the moment.</p>
+              ) : announcements.map((item) => (
+                <article key={item.announcement_id} className="rounded-2xl border border-slate-200 px-4 py-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <h4 className="text-sm font-bold text-slate-900">{item.title}</h4>
+                    <time dateTime={item.publication_date} className="text-xs font-semibold text-slate-500">{formatAnnouncementDate(item.publication_date)}</time>
                   </div>
-                  <p className="mt-2 text-sm text-slate-600">{item.description}</p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{item.description}</p>
                 </article>
               ))}
             </div>
@@ -238,7 +250,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="bg-red-950 text-white">
+      <footer id="about" className="bg-red-950 text-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.2fr_0.9fr_0.9fr_1fr] lg:px-8">
           <section>
             <h3 className="text-xl font-bold uppercase tracking-wide text-white">About Us</h3>

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS Authorized_New_Student (
+    Registration_Number VARCHAR(50) PRIMARY KEY,
+    Password_Hash VARCHAR(255) NOT NULL,
+    Is_Active BOOLEAN NOT NULL DEFAULT TRUE,
+    Registration_Completed BOOLEAN NOT NULL DEFAULT FALSE,
+    Created_At TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Completed_At TIMESTAMPTZ
+);

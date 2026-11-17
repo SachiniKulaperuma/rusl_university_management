@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { saveRegistrationFormDraft, submitRegistrationForm } from '../submitRegistrationForm';
 
 /* ── Year options ─────────────────────────────────────────────────── */
 const currentYear = new Date().getFullYear();
@@ -78,6 +79,7 @@ function ArtDanceRow({ tableKey, idx, onRemove, canRemove }: { tableKey: string;
 /* ── Main Page Component ─────────────────────────────────────────── */
 export default function SkillPage() {
   const formRef = useRef<HTMLFormElement>(null);
+  const formDataRef = useRef<Record<string, string>>({});
   const [segment, setSegment] = useState(1);
   const totalSegments = 4;
   const [submitting, setSubmitting] = useState(false);
@@ -141,22 +143,83 @@ export default function SkillPage() {
   }
 
   /* ── navigation ── */
-  function handleNext() {
-    if (segment < totalSegments) {
-      setSegment((s) => s + 1);
-    } else {
-      setSubmitting(true);
-      setTimeout(() => {
-        setSubmitting(false);
-        showToast('Special skills application successfully submitted!');
-        formRef.current?.reset();
-        setSegment(1);
-        resetRows();
-      }, 1200);
+  function captureSegmentData() {
+    if (!formRef.current) return;
+    new FormData(formRef.current).forEach((value, key) => {
+      if (typeof value === 'string') formDataRef.current[key] = value;
+    });
+    for (const id of ['sk-reg-no', 'sk-nic']) {
+      const field = document.getElementById(id) as HTMLInputElement | null;
+      if (field) formDataRef.current[field.name || id] = field.value;
     }
   }
 
-  function handlePrev() {
+  function restoreVisibleSegmentData() {
+    formRef.current?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input, textarea, select').forEach((field) => {
+      if (field.name in formDataRef.current) field.value = formDataRef.current[field.name];
+    });
+    for (const [id, key] of [['sk-reg-no', 'reg_no'], ['sk-nic', 'nic_passport']]) {
+      const field = document.getElementById(id) as HTMLInputElement | null;
+      if (field && key in formDataRef.current) field.value = formDataRef.current[key];
+    }
+  }
+
+  useEffect(() => {
+    let active = true;
+    fetch('http://localhost:5000/api/auth/new-student/session', { credentials: 'include', cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Unable to restore the skills form draft.');
+        return response.json();
+      })
+      .then((data) => {
+        if (!active || !data.draft?.skill || typeof data.draft.skill !== 'object') return;
+        formDataRef.current = data.draft.skill;
+        restoreVisibleSegmentData();
+      })
+      .catch((error) => console.warn('Unable to restore the skills form draft:', error));
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    restoreVisibleSegmentData();
+  }, [segment]);
+
+  async function handleNext() {
+    captureSegmentData();
+    if (segment < totalSegments) {
+      try {
+        await saveRegistrationFormDraft('skill', formDataRef.current);
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Unable to save the skills form draft.', true);
+        return;
+      }
+      setSegment((s) => s + 1);
+    } else {
+      setSubmitting(true);
+      try {
+        if (!formRef.current) throw new Error('The skills form is unavailable.');
+        await submitRegistrationForm('skill', formRef.current, formDataRef.current);
+        showToast('Special skills application successfully submitted!');
+        formRef.current?.reset();
+        formDataRef.current = {};
+        setSegment(1);
+        resetRows();
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Unable to save the skills application.', true);
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  }
+
+  async function handlePrev() {
+    captureSegmentData();
+    try {
+      await saveRegistrationFormDraft('skill', formDataRef.current);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to save the skills form draft.', true);
+      return;
+    }
     setSegment((s) => Math.max(1, s - 1));
   }
 

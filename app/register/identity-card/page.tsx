@@ -1,9 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
+import { submitRegistrationForm } from '../submitRegistrationForm';
 
 export default function IdentityCardPage() {
-  const [formData, setFormData] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('ID Card application submitted successfully!');
+  const [toastError, setToastError] = useState(false);
+
+  const showToast = (message: string, error = false) => {
+    setToastMessage(message);
+    setToastError(error);
+    setToastVisible(true);
+    window.setTimeout(() => setToastVisible(false), 3500);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      await submitRegistrationForm('identity-card', event.currentTarget);
+      showToast('ID Card application submitted successfully!');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to save the ID Card application.', true);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -365,6 +389,7 @@ export default function IdentityCardPage() {
       z-index: 1000;
     }
     .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.error { background: #b91c1c; }
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
@@ -393,7 +418,7 @@ export default function IdentityCardPage() {
           Note: Use English block capital letters to fill this application.
         </div>
 
-        <form id="idcard-form">
+        <form id="idcard-form" onSubmit={handleSubmit}>
         <div className="form-body">
 
           {/* ─── Basic Information ─── */}
@@ -528,11 +553,11 @@ export default function IdentityCardPage() {
 
         {/* Actions */}
         <div className="form-actions">
-          <button type="button" id="btn-clear" className="btn-clear">
+          <button type="reset" id="btn-clear" className="btn-clear">
             <i className="fas fa-rotate-left"></i> Clear
           </button>
-          <button type="submit" id="btn-submit" className="btn-submit">
-            <i className="fas fa-paper-plane"></i> Submit
+          <button type="submit" id="btn-submit" className="btn-submit" disabled={submitting}>
+            <i className={`fas ${submitting ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`}></i> {submitting ? 'Submitting...' : 'Submit'}
           </button>
         </div>
 
@@ -540,9 +565,9 @@ export default function IdentityCardPage() {
       </div>
     </main>
   {/* Toast */}
-  <div className="toast" id="success-toast">
+  <div className={`toast${toastVisible ? ' show' : ''}${toastError ? ' error' : ''}`} id="success-toast" role={toastError ? 'alert' : 'status'}>
     <i className="fas fa-circle-check"></i>
-    ID Card application submitted successfully!
+    {toastMessage}
   </div>
     </>
   );

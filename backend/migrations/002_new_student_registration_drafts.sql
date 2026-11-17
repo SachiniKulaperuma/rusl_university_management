@@ -1,0 +1,2 @@
+ALTER TABLE Authorized_New_Student
+ADD COLUMN IF NOT EXISTS Draft_Data JSONB NOT NULL DEFAULT '{}'::jsonb;

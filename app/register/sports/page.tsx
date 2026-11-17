@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { submitRegistrationForm } from '../submitRegistrationForm';
 
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from(
@@ -144,7 +145,7 @@ export default function SportsPage() {
     setSubmitting(false);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!formRef.current) return;
     if (!formRef.current.checkValidity()) {
@@ -153,10 +154,14 @@ export default function SportsPage() {
     }
 
     setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await submitRegistrationForm('sports', formRef.current);
       showToast('Physical attributes & sport achievements submitted successfully!');
-    }, 1200);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to save the sports application.', true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
 

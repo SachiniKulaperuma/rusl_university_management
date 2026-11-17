@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 export default function HeaderTop() {
     const pathname = usePathname();
-    const isSignInPage = pathname === '/signin';
+    const isSignInPage = pathname === '/signin' || pathname === '/admin/signin';
 
     return (
         <header
@@ -95,7 +95,7 @@ export default function HeaderTop() {
                 {!isSignInPage && (
                     <div style={{ flexShrink: 0 }}>
                         <Link
-                            href="/signin"
+                            href="/admin/signin"
                             id="header-login-btn"
                             style={{
                                 display: 'inline-flex',

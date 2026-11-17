@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { adminFetch } from "../adminFetch";
 
 export default function RegistrationsPage() {
   const [registrations, setRegistrations] = useState<any[]>([]);
@@ -12,7 +13,7 @@ export default function RegistrationsPage() {
 
   const fetchRegistrations = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/registrations");
+      const res = await adminFetch("http://localhost:5000/api/admin/registrations");
       const data = await res.json();
       if (data.success) {
         setRegistrations(data.registrations);
@@ -33,10 +34,10 @@ export default function RegistrationsPage() {
   const handleApprove = async (studentId: string) => {
     if (!confirm(`Approve all subject registrations for student ${studentId}?`)) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/registrations/approve/${encodeURIComponent(studentId)}`, { method: "PUT" });
+      const res = await adminFetch(`http://localhost:5000/api/admin/registrations/approve/${encodeURIComponent(studentId)}`, { method: "PUT" });
       const data = await res.json();
       if (data.success) {
-        alert("Registrations approved successfully!");
+        alert(`${data.approved_count} subject registration(s) approved successfully!`);
         fetchRegistrations();
       } else {
         alert(data.error || "Failed to approve");
@@ -55,6 +56,7 @@ export default function RegistrationsPage() {
         course: curr.course_of_study,
         academic_year: curr.academic_year,
         date: curr.registration_date,
+        dropped_at: curr.dropped_at,
         status: curr.status,
         subjects: [],
         total_credits: 0
@@ -63,7 +65,9 @@ export default function RegistrationsPage() {
     acc[curr.student_id].subjects.push({
       code: curr.subject_code,
       name: curr.subject_name,
-      credits: curr.credit_value
+      credits: curr.credit_value,
+      status: curr.status,
+      dropped_at: curr.dropped_at,
     });
     acc[curr.student_id].total_credits += curr.credit_value;
     return acc;
@@ -159,11 +163,21 @@ export default function RegistrationsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#e0f2fe] text-[#0284c7] border border-[#bae6fd]">
-                        {s.status}
+                      <span className="px-3 py-1 rounded-full text-xs font-bold border bg-[#e0f2fe] text-[#0284c7] border-[#bae6fd]">
+                        {Array.from(new Set(s.subjects.map((subject: { status: string }) => subject.status))).join(', ')}
                       </span>
+                      {s.dropped_at && <p className="mt-1 text-xs text-slate-500">Dropped: {new Date(s.dropped_at).toLocaleDateString()}</p>}
                     </td>
                     <td className="px-6 py-4 text-right">
+                      {s.subjects.some((subject: { status: string }) => subject.status === 'Enrolled') && (
+                        <button
+                          onClick={() => handleApprove(s.student_id)}
+                          className="mr-2 rounded-lg bg-[#16a34a] px-3 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#15803d]"
+                          title={`Approve all pending subjects for ${s.student_id}`}
+                        >
+                          <i className="fas fa-check mr-1"></i> Approve
+                        </button>
+                      )}
                       <button 
                         onClick={() => setSelectedStudent(selectedStudent === s.student_id ? null : s.student_id)}
                         className="p-2 text-[#94a3b8] hover:text-[#7C0A02] hover:bg-red-50 rounded-lg transition-colors focus:outline-none"
@@ -193,12 +207,14 @@ export default function RegistrationsPage() {
                     <h3 className="text-lg font-bold text-[#1e293b]">Selected Subjects</h3>
                     <p className="text-sm text-[#64748b]">{student.name} ({student.student_id})</p>
                   </div>
-                  <button 
-                    onClick={() => handleApprove(student.student_id)}
-                    className="px-4 py-2 bg-[#16a34a] text-white rounded-lg text-sm font-bold shadow-sm hover:bg-[#15803d] transition-colors"
-                  >
-                    <i className="fas fa-check mr-2"></i> Approve Registration
-                  </button>
+                  {student.subjects.some((subject: { status: string }) => subject.status === 'Enrolled') && (
+                    <button 
+                      onClick={() => handleApprove(student.student_id)}
+                      className="px-4 py-2 bg-[#16a34a] text-white rounded-lg text-sm font-bold shadow-sm hover:bg-[#15803d] transition-colors"
+                    >
+                      <i className="fas fa-check mr-2"></i> Approve Registration
+                    </button>
+                  )}
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -206,6 +222,7 @@ export default function RegistrationsPage() {
                     <div key={idx} className="bg-[#f8fafc] border border-[#e2e8f0] rounded-lg p-4">
                       <div className="text-xs font-bold text-[#94a3b8] mb-1">{sub.code}</div>
                       <div className="font-semibold text-[#334155] text-sm leading-tight mb-2">{sub.name}</div>
+                      <div className={`mb-2 text-xs font-bold ${sub.status === 'Dropped' ? 'text-red-700' : sub.status === 'Approved' ? 'text-green-700' : 'text-[#0284c7]'}`}>{sub.status}{sub.dropped_at ? ` · Dropped ${new Date(sub.dropped_at).toLocaleDateString()}` : ''}</div>
                       <div className="text-xs font-bold text-[#7C0A02] bg-red-50 inline-block px-2 py-0.5 rounded border border-red-100">
                         {sub.credits} Credits
                       </div>

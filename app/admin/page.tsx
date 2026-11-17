@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { adminFetch } from "./adminFetch";
 
 interface Registration {
   student_id: string;
@@ -33,8 +34,8 @@ export default function AdminDashboard() {
     async function fetchDashboardData() {
       try {
         const [studentsRes, regRes] = await Promise.all([
-          fetch("http://localhost:5000/api/admin/students"),
-          fetch("http://localhost:5000/api/admin/registrations")
+          adminFetch("http://localhost:5000/api/admin/students"),
+          adminFetch("http://localhost:5000/api/admin/registrations")
         ]);
         
         const studentsData = await studentsRes.json();

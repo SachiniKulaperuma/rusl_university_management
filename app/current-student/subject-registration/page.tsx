@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -18,6 +17,43 @@ const sidebarLinks = [
 
 type View = 'selection' | 'pending' | 'confirmed';
 
+type StudentInfo = {
+    student_id?: string;
+    name_with_initials?: string;
+};
+
+type Subject = {
+    subject_id: number;
+    subject_code: string;
+    subject_name: string;
+    credit_value: number;
+    course_status: string | null;
+    academic_year: number | string | null;
+    semester: number;
+    department: string;
+};
+
+type RegistrationPeriod = {
+    intakeYear: number;
+    academicYear: number;
+    semester: number;
+    subjects: Subject[];
+};
+
+type RegisteredSubject = {
+    registration_id: number;
+    registration_date: string;
+    dropped_at: string | null;
+    academic_year: string;
+    status: string;
+    subject_code: string;
+    subject_name: string;
+    credit_value: number;
+    course_status: 'C' | 'O' | null;
+};
+
+const DROP_WINDOW_MS = 21 * 24 * 60 * 60 * 1000;
+
 function Tick({ color = 'white' }: { color?: string }) {
     return (
         <svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke={color} strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
@@ -28,29 +64,145 @@ function Tick({ color = 'white' }: { color?: string }) {
 
 export default function SubjectRegistrationPage() {
     const [view, setView] = useState<View>('selection');
-    const [compulsorySubjects, setCompulsorySubjects] = useState<any[]>([]);
-    const [optionalSubjects, setOptionalSubjects] = useState<any[]>([]);
+    const [compulsorySubjects, setCompulsorySubjects] = useState<{ id: number; code: string; title: string; credits: number }[]>([]);
+    const [optionalSubjects, setOptionalSubjects] = useState<{ id: number; code: string; title: string; credits: number }[]>([]);
     const [loadingSubjects, setLoadingSubjects] = useState(true);
-    const [studentInfo, setStudentInfo] = useState<any>(null);
+    const [studentInfo, setStudentInfo] = useState<StudentInfo | null>(null);
+    const [registrationPeriod, setRegistrationPeriod] = useState<RegistrationPeriod | null>(null);
+    const [registrationError, setRegistrationError] = useState<string | null>(null);
+    const [registeredSubjects, setRegisteredSubjects] = useState<RegisteredSubject[]>([]);
+    const [dropMessage, setDropMessage] = useState<string | null>(null);
+    const [droppingId, setDroppingId] = useState<number | null>(null);
+    const [currentTime, setCurrentTime] = useState<number | null>(null);
 
     useEffect(() => {
-        const stored = localStorage.getItem('student');
-        if (stored) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setStudentInfo(JSON.parse(stored));
-        }
-        
-        fetch('http://localhost:5000/api/subjects/all')
-            .then(res => res.json())
-            .then(data => {
-                // Hardcoding Year 1 Sem 1 for B.ICT for now
-                const filtered = data.filter((s: any) => s.academic_year === 1 && s.semester === 1 && s.department === 'B.ICT');
-                setCompulsorySubjects(filtered.filter((s: any) => s.course_status && s.course_status.startsWith('C')).map((s: any) => ({ id: s.subject_id, code: s.subject_code, title: s.subject_name, credits: s.credit_value })));
-                setOptionalSubjects(filtered.filter((s: any) => s.course_status === 'O').map((s: any) => ({ id: s.subject_id, code: s.subject_code, title: s.subject_name, credits: s.credit_value })));
-                setLoadingSubjects(false);
-            })
-            .catch(err => console.error(err));
+        const updateCurrentTime = () => setCurrentTime(Date.now());
+        updateCurrentTime();
+        const timer = window.setInterval(updateCurrentTime, 60_000);
+        return () => window.clearInterval(timer);
     }, []);
+
+    useEffect(() => {
+        let isActive = true;
+
+        async function loadSubjects() {
+            try {
+                const stored = localStorage.getItem('student');
+                if (!stored) {
+                    throw new Error('Please sign in to view your subject registration.');
+                }
+
+                const student = JSON.parse(stored) as StudentInfo;
+                if (!student.student_id) {
+                    throw new Error('Your account does not contain a registration number.');
+                }
+                if (isActive) setStudentInfo(student);
+
+                const token = localStorage.getItem('token');
+                const registeredResponse = await fetch(`http://localhost:5000/api/registrations/student/${encodeURIComponent(student.student_id)}`, {
+                    headers: token ? { Authorization: `Bearer ${token}` } : {},
+                });
+                if (!registeredResponse.ok) {
+                    const errorData = await registeredResponse.json().catch(() => ({}));
+                    throw new Error(errorData.error || 'Unable to load your registered subjects.');
+                }
+                const registeredData = await registeredResponse.json();
+                if (isActive) setRegisteredSubjects(registeredData);
+
+                const registrationNumber = /^ITT\/(\d{4})\/\d{3}$/i.exec(student.student_id.trim());
+                if (!registrationNumber) {
+                    throw new Error('Invalid registration number. Expected format ITT/YYYY/XXX.');
+                }
+
+                const intakeYear = Number(registrationNumber[1]);
+                const currentDate = new Date();
+                const academicYear = currentDate.getFullYear() - intakeYear + 1;
+                if (academicYear < 1 || academicYear > 4) {
+                    throw new Error('This registration number does not map to Academic Year 1-4.');
+                }
+                const semester = currentDate.getMonth() < 6 ? 1 : 2;
+
+                const response = await fetch('http://localhost:5000/api/subjects/all');
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Unable to load your subject registration.');
+                }
+                if (!Array.isArray(data)) {
+                    throw new Error('The subjects API returned an invalid response.');
+                }
+
+                const subjects = (data as Subject[]).filter(subject => {
+                    const hasAcademicYear = subject.academic_year !== null
+                        && subject.academic_year !== undefined
+                        && subject.academic_year !== '';
+                    const storedSemester = Number(subject.semester);
+                    const subjectAcademicYear = hasAcademicYear
+                        ? Number(subject.academic_year)
+                        : Math.ceil(storedSemester / 2);
+                    const subjectSemester = hasAcademicYear
+                        ? storedSemester
+                        : ((storedSemester - 1) % 2) + 1;
+
+                    return subject.department === 'B.ICT'
+                        && subjectAcademicYear === academicYear
+                        && subjectSemester === semester;
+                });
+                if (isActive) {
+                    setRegistrationPeriod({
+                        intakeYear,
+                        academicYear,
+                        semester,
+                        subjects,
+                    });
+                    setCompulsorySubjects(subjects
+                        .filter(subject => subject.course_status?.startsWith('C'))
+                        .map(subject => ({ id: subject.subject_id, code: subject.subject_code, title: subject.subject_name, credits: subject.credit_value })));
+                    setOptionalSubjects(subjects
+                        .filter(subject => subject.course_status === 'O')
+                        .map(subject => ({ id: subject.subject_id, code: subject.subject_code, title: subject.subject_name, credits: subject.credit_value })));
+                }
+            } catch (err) {
+                if (isActive) {
+                    setRegistrationError(err instanceof Error ? err.message : 'Unable to load your subject registration.');
+                }
+            } finally {
+                if (isActive) setLoadingSubjects(false);
+            }
+        }
+
+        void loadSubjects();
+        return () => { isActive = false; };
+    }, []);
+
+    const dropDeadline = (registered: RegisteredSubject) => new Date(new Date(registered.registration_date).getTime() + DROP_WINDOW_MS);
+    const canDrop = (registered: RegisteredSubject) => registered.course_status === 'O'
+        && registered.status !== 'Dropped'
+        && currentTime !== null
+        && currentTime <= dropDeadline(registered).getTime();
+
+    const handleDrop = async (registered: RegisteredSubject) => {
+        if (!canDrop(registered)) return;
+        if (!confirm('Are you sure you want to drop this optional subject?')) return;
+        setDroppingId(registered.registration_id);
+        setDropMessage(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/registrations/${registered.registration_id}/drop`, {
+                method: 'PUT',
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(data.error || 'Unable to drop this subject.');
+            setRegisteredSubjects(current => current.map(item => item.registration_id === registered.registration_id
+                ? { ...item, status: 'Dropped', dropped_at: data.registration.dropped_at }
+                : item));
+            setDropMessage(data.message || 'Optional subject dropped successfully.');
+        } catch (error) {
+            setDropMessage(error instanceof Error ? error.message : 'Unable to drop this subject.');
+        } finally {
+            setDroppingId(null);
+        }
+    };
 
     const COMP_CREDITS = compulsorySubjects.reduce((sum, s) => sum + s.credits, 0);
     const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -59,11 +211,15 @@ export default function SubjectRegistrationPage() {
     const optCredits = optionalSubjects.filter(s => selected[s.id]).reduce((sum, s) => sum + s.credits, 0);
     const optCount = Object.values(selected).filter(Boolean).length;
     const totalCredits = COMP_CREDITS + optCredits;
+    const chosenSubjects = [
+        ...compulsorySubjects,
+        ...optionalSubjects.filter(subject => selected[subject.id]),
+    ];
 
     const toggle = (id: string) => setSelected(p => ({ ...p, [id]: !p[id] }));
 
     const handleRegistration = async () => {
-        if (!studentInfo || !declared) return;
+        if (!studentInfo?.student_id || !registrationPeriod || !declared) return;
         setView('pending');
         
         try {
@@ -72,17 +228,20 @@ export default function SubjectRegistrationPage() {
                 ...optionalSubjects.filter(s => selected[s.id]).map(s => s.id)
             ];
 
-            // Send sequentially or in parallel
             for (const subjectId of allSubjectIds) {
-                await fetch('http://localhost:5000/api/registrations/enroll', {
+                const response = await fetch('http://localhost:5000/api/registrations/enroll', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         student_id: studentInfo.student_id,
                         subject_id: subjectId,
-                        academic_year: '2025/2026'
+                        academic_year: String(registrationPeriod.academicYear),
                     })
                 });
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.error || 'Registration failed.');
+                }
             }
             
             setTimeout(() => {
@@ -90,7 +249,7 @@ export default function SubjectRegistrationPage() {
             }, 1000);
         } catch (err) {
             console.error('Registration error:', err);
-            alert('An error occurred during registration. Please try again.');
+            alert(err instanceof Error ? err.message : 'An error occurred during registration. Please try again.');
             setView('selection');
         }
     };
@@ -166,25 +325,52 @@ export default function SubjectRegistrationPage() {
                         {/* Info ribbon */}
                         <div className="bg-white border border-slate-200 rounded-xl px-5 py-4 flex flex-wrap gap-6 items-center shadow-sm">
                             {[
-                                { label: 'Academic Year', value: '2025/2026' },
-                                { label: 'Semester', value: 'Year 3 Semester II' },
-                                { label: 'Period', value: '01 Jul – 14 Jul 2025' },
+                                { label: 'Academic Year', value: registrationPeriod ? `Year ${registrationPeriod.academicYear}` : 'Calculating...' },
+                                { label: 'Semester', value: registrationPeriod ? `Semester ${registrationPeriod.semester === 1 ? 'I' : 'II'}` : 'Calculating...' },
+                                { label: 'Intake Year', value: registrationPeriod?.intakeYear ?? '—' },
                             ].map(i => (
                                 <div key={i.label} className="flex flex-col gap-0.5">
                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{i.label}</span>
                                     <span className="text-sm font-bold text-slate-800">{i.value}</span>
                                 </div>
                             ))}
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Status</span>
-                                <span className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 rounded px-2 py-0.5">Registration Open</span>
-                            </div>
-                            <div className="flex flex-col gap-0.5">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Days Left</span>
-                                <span className="text-sm font-bold text-orange-600">7 Days</span>
-                            </div>
                         </div>
 
+                        {loadingSubjects ? (
+                            <p role="status" className="rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-600">Loading subjects for your academic year and semester...</p>
+                        ) : registrationError ? (
+                            <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-5 text-sm text-red-700">{registrationError}</p>
+                        ) : registrationPeriod?.subjects.length === 0 ? (
+                            <p role="status" className="rounded-lg border border-amber-200 bg-amber-50 p-5 text-sm text-amber-800">
+                                No subjects are configured for Year {registrationPeriod.academicYear}, Semester {registrationPeriod.semester === 1 ? 'I' : 'II'}.
+                            </p>
+                        ) : (
+                        <>
+                        {dropMessage && <p role="status" className="rounded-lg border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-700">{dropMessage}</p>}
+                        {registeredSubjects.length > 0 && (
+                          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                            <div className="px-6 py-4 border-b border-slate-100">
+                              <h2 className="text-sm font-bold text-slate-800">Registered Subjects</h2>
+                              <p className="mt-1 text-xs text-slate-500">Optional subjects can be dropped within 21 days of registration.</p>
+                            </div>
+                            <div className="overflow-x-auto"><table className="w-full text-left"><thead><tr className="bg-slate-50 border-b border-slate-100">
+                              {['Code', 'Subject', 'Type', 'Status', 'Drop deadline', 'Action'].map(label => <th key={label} className="px-4 py-3 text-[11px] font-bold text-slate-400 uppercase tracking-wide">{label}</th>)}
+                            </tr></thead><tbody className="divide-y divide-slate-100">
+                              {registeredSubjects.map(registered => {
+                                const deadline = dropDeadline(registered);
+                                const ended = currentTime !== null && currentTime > deadline.getTime();
+                                return <tr key={registered.registration_id} className="hover:bg-slate-50/60">
+                                  <td className="px-4 py-3 text-sm font-bold text-[#7A0016]">{registered.subject_code}</td>
+                                  <td className="px-4 py-3 text-sm text-slate-700">{registered.subject_name}</td>
+                                  <td className="px-4 py-3 text-xs font-bold text-slate-600">{registered.course_status === 'O' ? 'Optional' : 'Compulsory'}</td>
+                                  <td className="px-4 py-3 text-xs font-bold text-slate-600">{registered.status}{registered.dropped_at ? ` (${new Date(registered.dropped_at).toLocaleDateString()})` : ''}</td>
+                                  <td className="px-4 py-3 text-xs text-slate-500">{deadline.toLocaleString()}</td>
+                                  <td className="px-4 py-3">{canDrop(registered) ? <button onClick={() => handleDrop(registered)} disabled={droppingId === registered.registration_id} className="rounded-lg bg-red-700 px-3 py-2 text-xs font-bold text-white hover:bg-red-800 disabled:opacity-60">{droppingId === registered.registration_id ? 'Dropping...' : 'Drop Subject'}</button> : <span className="text-xs text-slate-500">{registered.course_status !== 'O' ? 'Compulsory' : registered.status === 'Dropped' ? 'Dropped' : ended ? 'Drop period ended' : 'Unavailable'}</span>}</td>
+                                </tr>;
+                              })}
+                            </tbody></table></div>
+                          </div>
+                        )}
                         <div className="grid gap-6 lg:grid-cols-[1.8fr_1fr] items-start">
                             <div className="flex flex-col gap-6">
 
@@ -240,7 +426,7 @@ export default function SubjectRegistrationPage() {
                                             </thead>
                                             <tbody className="divide-y divide-slate-100">
                                                 {optionalSubjects.map(s => (
-                                                    <tr key={s.id} className="hover:bg-slate-50/60 cursor-pointer" onClick={() => toggle(s.id)}>
+                                                    <tr key={s.id} className="hover:bg-slate-50/60 cursor-pointer" onClick={() => toggle(String(s.id))}>
                                                         <td className="px-4 py-4 text-center">
                                                             <span className={['inline-flex items-center justify-center w-5 h-5 rounded border-2 transition-all duration-200',
                                                                 selected[s.id] ? 'bg-[#7A0016] border-[#7A0016]' : 'bg-white border-slate-300 hover:border-[#7A0016]',
@@ -325,7 +511,7 @@ export default function SubjectRegistrationPage() {
                                         By submitting, you acknowledge the registration guidelines.
                                     </p>
                                     <button
-                                        disabled={!declared}
+                                        disabled={!declared || !registrationPeriod?.subjects.length}
                                         onClick={handleRegistration}
                                         className={['w-full py-3.5 rounded-xl text-sm font-bold transition-all duration-200',
                                             declared ? 'bg-[#7A0016] text-white hover:bg-[#5c0010] hover:shadow-lg hover:-translate-y-0.5 cursor-pointer' : 'bg-[#7A0016]/40 text-white cursor-not-allowed',
@@ -335,6 +521,8 @@ export default function SubjectRegistrationPage() {
                                 </div>
                             </div>
                         </div>
+                        </>
+                        )}
                     </main>
                 )}
 
@@ -349,8 +537,8 @@ export default function SubjectRegistrationPage() {
 
                         <div className="grid grid-cols-2 sm:grid-cols-5 bg-white border border-slate-200 rounded-xl shadow-sm mb-6 divide-x divide-slate-200">
                             {[
-                                { label: 'Academic Year', value: '2025/2026' },
-                                { label: 'Current Term', value: 'Year 3 Sem. II' },
+                                { label: 'Academic Year', value: registrationPeriod ? `Year ${registrationPeriod.academicYear}` : '—' },
+                                { label: 'Current Term', value: registrationPeriod ? `Semester ${registrationPeriod.semester === 1 ? 'I' : 'II'}` : '—' },
                                 { label: 'Submission Date', value: '13-07-2026' },
                                 { label: 'Status', value: 'Pending Review', cls: 'text-orange-500' },
                                 { label: 'Receipt Code', value: '#RUSL-83921', cls: 'font-mono' },
@@ -384,11 +572,11 @@ export default function SubjectRegistrationPage() {
 
                         <div className="grid grid-cols-2 sm:grid-cols-5 bg-white border border-slate-200 rounded-xl shadow-sm mb-6 divide-x divide-slate-200">
                             {[
-                                { label: 'Type', value: 'Regular Student' },
-                                { label: 'Group', value: 'ICT-A Batch' },
-                                { label: 'Subjects', value: '5 Modules' },
-                                { label: 'Total Credits', value: '13 Credits', cls: 'text-green-700' },
-                                { label: 'Authorization', value: 'Approved by Dean', cls: 'text-green-700 uppercase' },
+                                { label: 'Academic Year', value: registrationPeriod ? `Year ${registrationPeriod.academicYear}` : '—' },
+                                { label: 'Semester', value: registrationPeriod ? `Semester ${registrationPeriod.semester === 1 ? 'I' : 'II'}` : '—' },
+                                { label: 'Subjects', value: `${chosenSubjects.length} Modules` },
+                                { label: 'Total Credits', value: `${totalCredits} Credits`, cls: 'text-green-700' },
+                                { label: 'Status', value: 'Enrolled', cls: 'text-green-700' },
                             ].map((item, i) => (
                                 <div key={i} className="p-5">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">{item.label}</p>
@@ -411,18 +599,12 @@ export default function SubjectRegistrationPage() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
-                                        {[
-                                            { code: 'ICT 3201', title: 'Rapid Application Development', credits: 3, assessment: 'Exam + Project Portfolio' },
-                                            { code: 'ICT 3202', title: 'Advanced Database Management Systems', credits: 3, assessment: 'Written Exam' },
-                                            { code: 'ICT 3203', title: 'Data Mining & Knowledge Analytics', credits: 2, assessment: 'Continuous Assessment' },
-                                            { code: 'ICT 3305', title: 'Advanced Computer Networks Architecture', credits: 3, assessment: 'Lab Practicals + Exam' },
-                                            { code: 'ICT 3206', title: 'Human-Computer Interaction Frameworks', credits: 2, assessment: 'Interface Presentation' },
-                                        ].map(s => (
-                                            <tr key={s.code} className="hover:bg-slate-50/60">
-                                                <td className="px-4 py-4 text-sm font-bold text-[#7A0016]">{s.code}</td>
-                                                <td className="px-4 py-4 text-sm text-slate-700">{s.title}</td>
-                                                <td className="px-4 py-4 text-sm font-semibold text-slate-700 text-center">{s.credits}</td>
-                                                <td className="px-4 py-4 text-sm text-slate-500">{s.assessment}</td>
+                                        {chosenSubjects.map(subject => (
+                                            <tr key={subject.id} className="hover:bg-slate-50/60">
+                                                <td className="px-4 py-4 text-sm font-bold text-[#7A0016]">{subject.code}</td>
+                                                <td className="px-4 py-4 text-sm text-slate-700">{subject.title}</td>
+                                                <td className="px-4 py-4 text-sm font-semibold text-slate-700 text-center">{subject.credits}</td>
+                                                <td className="px-4 py-4 text-sm text-slate-500">Enrolled</td>
                                             </tr>
                                         ))}
                                     </tbody>

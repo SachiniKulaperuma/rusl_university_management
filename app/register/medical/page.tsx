@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { saveRegistrationFormDraft, submitRegistrationForm } from '../submitRegistrationForm';
 
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: currentYear - 1989 }, (_, i) => currentYear - i);
@@ -67,6 +68,7 @@ function ArtDanceRow({ tableKey, idx, onRemove, canRemove }: { tableKey: string;
 
 export default function MedicalPage() {
   const formRef = useRef<HTMLFormElement>(null);
+  const formDataRef = useRef<Record<string, string>>({});
   const [segment, setSegment] = useState(1);
   const totalSegments = 4;
   const [submitting, setSubmitting] = useState(false);
@@ -124,22 +126,85 @@ export default function MedicalPage() {
     setOratoryRows(buildInitialRows(4)); setLeadershipRows(buildInitialRows(4));
   }
 
-  function handleNext() {
-    if (segment < totalSegments) {
-      setSegment((s) => s + 1);
-    } else {
-      setSubmitting(true);
-      setTimeout(() => {
-        setSubmitting(false);
-        showToast('Medical report successfully submitted!');
-        formRef.current?.reset();
-        setSegment(1);
-        resetRows();
-      }, 1200);
+  function captureSegmentData() {
+    if (!formRef.current) return;
+    new FormData(formRef.current).forEach((value, key) => {
+      if (typeof value === 'string') formDataRef.current[key] = value;
+    });
+    for (const id of ['med-reg-no', 'med-nic']) {
+      const field = document.getElementById(id) as HTMLInputElement | null;
+      if (field) formDataRef.current[field.name || id] = field.value;
     }
   }
 
-  function handlePrev() { setSegment((s) => Math.max(1, s - 1)); }
+  function restoreVisibleSegmentData() {
+    formRef.current?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('input, textarea, select').forEach((field) => {
+      if (field.name in formDataRef.current) field.value = formDataRef.current[field.name];
+    });
+    for (const [id, key] of [['med-reg-no', 'reg_no'], ['med-nic', 'nic_passport']]) {
+      const field = document.getElementById(id) as HTMLInputElement | null;
+      if (field && key in formDataRef.current) field.value = formDataRef.current[key];
+    }
+  }
+
+  useEffect(() => {
+    let active = true;
+    fetch('http://localhost:5000/api/auth/new-student/session', { credentials: 'include', cache: 'no-store' })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Unable to restore the medical form draft.');
+        return response.json();
+      })
+      .then((data) => {
+        if (!active || !data.draft?.medical || typeof data.draft.medical !== 'object') return;
+        formDataRef.current = data.draft.medical;
+        restoreVisibleSegmentData();
+      })
+      .catch((error) => console.warn('Unable to restore the medical form draft:', error));
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    restoreVisibleSegmentData();
+  }, [segment]);
+
+  async function handleNext() {
+    captureSegmentData();
+    if (segment < totalSegments) {
+      try {
+        await saveRegistrationFormDraft('medical', formDataRef.current);
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Unable to save the medical form draft.', true);
+        return;
+      }
+      setSegment((s) => s + 1);
+    } else {
+      setSubmitting(true);
+      try {
+        if (!formRef.current) throw new Error('The medical form is unavailable.');
+        await submitRegistrationForm('medical', formRef.current, formDataRef.current);
+        showToast('Medical report successfully submitted!');
+        formRef.current?.reset();
+        formDataRef.current = {};
+        setSegment(1);
+        resetRows();
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Unable to save the medical report.', true);
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  }
+
+  async function handlePrev() {
+    captureSegmentData();
+    try {
+      await saveRegistrationFormDraft('medical', formDataRef.current);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to save the medical form draft.', true);
+      return;
+    }
+    setSegment((s) => Math.max(1, s - 1));
+  }
 
   function handleClear() {
     if (!confirm('Clear fields across all 4 segments? This reset action is permanent.')) return;

@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { submitRegistrationForm } from '../submitRegistrationForm';
 
 const districtOptions = [
   'Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle',
@@ -56,7 +57,7 @@ export default function ResidentialsPage() {
     setSubmitting(false);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!formRef.current) return;
     if (!formRef.current.checkValidity()) {
@@ -65,11 +66,15 @@ export default function ResidentialsPage() {
       return;
     }
     setSubmitting(true);
-    window.setTimeout(() => {
-      setSubmitting(false);
+    try {
+      await submitRegistrationForm('residentials', formRef.current);
       showToast('Residential facilities application submitted successfully!');
       formRef.current?.reset();
-    }, 1200);
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Unable to save the residential application.', true);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const downloadForm = () => {

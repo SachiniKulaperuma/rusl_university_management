@@ -59,11 +59,11 @@ export default function CurrentStudentPage() {
         {
             id: "exam-title",
             emoji: "📝",
-            title: "Exam Registration",
+            title: "Exam Admission",
             description:
                 "Register for your semester exams. Select the exams you wish to appear and submit your registration.",
             href: "/current-student/exam-admission",
-            label: " Exam Registration",
+            label: "Exam Admission",
         },
     ];
 

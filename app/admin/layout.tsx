@@ -1,19 +1,55 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
+  const [adminName, setAdminName] = useState("Admin User");
+  const isAdminSignIn = pathname === "/admin/signin";
+
+  useEffect(() => {
+    if (isAdminSignIn) return;
+
+    const token = localStorage.getItem("adminToken");
+    const storedAdmin = localStorage.getItem("admin");
+    if (!token || !storedAdmin) {
+      router.replace("/admin/signin");
+      return;
+    }
+
+    try {
+      const admin = JSON.parse(storedAdmin);
+      setAdminName(admin.name || admin.email || "Admin User");
+      setAuthReady(true);
+    } catch {
+      localStorage.removeItem("adminToken");
+      localStorage.removeItem("admin");
+      router.replace("/admin/signin");
+    }
+  }, [isAdminSignIn, router]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("admin");
+    router.replace("/admin/signin");
+  };
+
+  if (isAdminSignIn) return <>{children}</>;
+  if (!authReady) return null;
 
   const navItems = [
     { name: "Dashboard", icon: "fas fa-chart-pie", path: "/admin" },
     { name: "Students", icon: "fas fa-user-graduate", path: "/admin/students" },
+    { name: "New Student Access", icon: "fas fa-user-lock", path: "/admin/new-student-access" },
     { name: "Subjects", icon: "fas fa-book", path: "/admin/subjects" },
+    { name: "Announcements", icon: "fas fa-bullhorn", path: "/admin/announcements" },
     { name: "Registrations", icon: "fas fa-clipboard-list", path: "/admin/registrations" },
-    { name: "Exams", icon: "fas fa-file-signature", path: "/admin/exams" },
+    { name: "Exam Admissions", icon: "fas fa-file-signature", path: "/admin/exams" },
     { name: "Facilities", icon: "fas fa-building", path: "/admin/facilities" },
     { name: "Settings", icon: "fas fa-cog", path: "/admin/settings" },
   ];
@@ -85,15 +121,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <i className="fas fa-bell text-xl"></i>
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#ef4444] rounded-full border-2 border-white"></span>
             </button>
-            <div className="flex items-center gap-3 border-l border-[#e2e8f0] pl-6 cursor-pointer">
+            <button type="button" onClick={handleLogout} className="flex items-center gap-3 border-l border-[#e2e8f0] pl-6 cursor-pointer text-left">
               <div className="text-right hidden md:block">
-                <p className="text-[0.9rem] font-bold text-[#1e293b] m-0 leading-tight">Admin User</p>
-                <p className="text-[0.75rem] font-medium text-[#64748b] m-0">Super Admin</p>
+                <p className="text-[0.9rem] font-bold text-[#1e293b] m-0 leading-tight">{adminName}</p>
+                <p className="text-[0.75rem] font-medium text-[#64748b] m-0">Sign out</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-[#7C0A02] text-white flex items-center justify-center font-bold shadow-md">
-                AU
+                {adminName.slice(0, 1).toUpperCase()}
               </div>
-            </div>
+            </button>
           </div>
         </header>
 

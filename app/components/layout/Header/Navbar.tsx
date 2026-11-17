@@ -25,7 +25,7 @@ const Navbar = () => {
 
           <ul className="flex gap-8 items-center justify-end flex-1" id="nav-links">
             <li><Link href="/" className="text-gray-700 hover:text-blue-600 transition duration-200 active:text-blue-700" id="nl-home">Home</Link></li>
-            <li><Link href="#about" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-about">About Us</Link></li>
+            <li><Link href="/#about" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-about">About Us</Link></li>
             <li><Link href="/register/student-personal-info" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-register">Register</Link></li>
             <li><Link href="#" className="text-gray-700 hover:text-blue-600 transition duration-200" id="nl-staff">Staff</Link></li>
           </ul>
@@ -41,7 +41,7 @@ const Navbar = () => {
       >
         <div className="flex flex-col space-y-2 p-4">
           <Link href="#" className="text-gray-700 hover:text-blue-600 py-2 px-3 rounded-md hover:bg-gray-50 transition" id="mn-home">Home</Link>
-          <Link href="#about" className="text-gray-700 hover:text-blue-600 py-2 px-3 rounded-md hover:bg-gray-50 transition" id="mn-about">About Us</Link>
+          <Link href="/#about" className="text-gray-700 hover:text-blue-600 py-2 px-3 rounded-md hover:bg-gray-50 transition" id="mn-about" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
           <Link href="/register/student-personal-info" className="text-gray-700 hover:text-blue-600 py-2 px-3 rounded-md hover:bg-gray-50 transition" id="mn-register">Register</Link>
           <Link href="#" className="text-gray-700 hover:text-blue-600 py-2 px-3 rounded-md hover:bg-gray-50 transition" id="mn-staff">Staff</Link>
         </div>

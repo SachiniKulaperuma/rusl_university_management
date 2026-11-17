@@ -1,15 +1,34 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function StudentRegistration() {
 	// --- State Variables ---
 	const [showToast, setShowToast] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [registrationNumber, setRegistrationNumber] = useState('');
 
 	// --- Form Controlled Inputs for Declaration Sync ---
 	const [fullName, setFullName] = useState('');
 	const [guardianName, setGuardianName] = useState('');
+
+	useEffect(() => {
+		let isActive = true;
+
+		fetch('http://localhost:5000/api/auth/new-student/session', {
+			credentials: 'include',
+		})
+			.then(async response => {
+				if (!response.ok) throw new Error('Unable to verify registration session.');
+				return response.json();
+			})
+			.then(data => {
+				if (isActive) setRegistrationNumber(data.registration_number || '');
+			})
+			.catch(error => console.error('Unable to load authorized registration number:', error));
+
+		return () => { isActive = false; };
+	}, []);
 
 	// --- Date Initialization for Declaration ---
 	const now = new Date();
@@ -66,18 +85,27 @@ export default function StudentRegistration() {
 		try {
 			const res = await fetch('http://localhost:5000/api/auth/register', {
 				method: 'POST',
+				credentials: 'include',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(payload)
 			});
 			const data = await res.json();
 			if (res.ok) {
+				window.dispatchEvent(new CustomEvent('registration-form-submitted', {
+					detail: { formKey: 'student-personal-info' },
+				}));
 				setShowToast(true);
 				setTimeout(() => setShowToast(false), 4000);
-				handleClear(); // Clear the form on success
 			} else {
-				alert('Error: ' + (data.error || 'Registration failed'));
+				window.dispatchEvent(new CustomEvent('registration-form-submit-failed', {
+					detail: { formKey: 'student-personal-info' },
+				}));
+				alert(data.error || 'Registration failed');
 			}
 		} catch {
+			window.dispatchEvent(new CustomEvent('registration-form-submit-failed', {
+				detail: { formKey: 'student-personal-info' },
+			}));
 			alert('Failed to connect to the server.');
 		} finally {
 			setIsSubmitting(false);
@@ -116,7 +144,7 @@ export default function StudentRegistration() {
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<div className="flex flex-col gap-1.5">
 								<label className={labelClass} htmlFor="reg-no"><span className="font-bold text-[#7C0A02] mr-1">1.</span> Registration No</label>
-								<input type="text" id="reg-no" className={inputClass} placeholder="e.g. ITT/2023/076, ENT/2023/076, or BST/2023/076" />
+								<input type="text" id="reg-no" className={inputClass} value={registrationNumber} readOnly placeholder="Loading registration number..." required />
 							</div>
 							<div className="flex flex-col gap-1.5">
 								<label className={labelClass} htmlFor="nic-no"><span className="font-bold text-[#7C0A02] mr-1">2.</span> National Identity Card or Passport No</label>
@@ -417,7 +445,7 @@ export default function StudentRegistration() {
 			{/* Toast Alert */}
 			<div className={`fixed bottom-7 right-7 bg-green-700 text-white px-5 py-3.5 rounded-lg text-sm font-semibold shadow-xl z-50 transition-all duration-300 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
 				}`}>
-				<i className="fas fa-circle-check mr-1"></i> Application submitted successfully!
+				<i className="fas fa-circle-check mr-1"></i> Personal information saved successfully. Continue with the remaining forms.
 			</div>
 		</div>
 	);
